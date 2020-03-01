@@ -12,3 +12,4 @@ __pycache__/
 debug.png
 secrets.json
 data/
+env/
