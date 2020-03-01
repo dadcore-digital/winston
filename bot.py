@@ -1,8 +1,8 @@
 import json
 import os
-import random
-import discord
 from discord.ext import commands
+from cogs.diagnostics import Diagnostic
+
 
 # Private Key Settings: (Store all sensitive keys/other data for settings
 # files outside version control)
@@ -25,29 +25,12 @@ def get_secret(setting, secrets=secrets):
 
     except KeyError:
         error_msg = "Missing %s setting from secrets file" % setting
-        raise ImproperlyConfigured(error_msg)
+        raise Exception(error_msg)
 
 
 BOT_TOKEN = get_secret('BOT_TOKEN')
 bot = commands.Bot(command_prefix=commands.when_mentioned)
 
-
-@bot.command()
-async def echo(context, *args):
-    await context.send(' '.join(args))
-
-
-@bot.command()
-async def what(context, *args):
-    choices = [
-        'Search your heart for the answer.',
-        'IDFK!',
-        'You tell me.',
-        'What do you think?',
-        'I honestly don\'t know.'
-    ]
-    msg = random.choice(choices)
-    await context.send(msg)
-
+bot.add_cog(Diagnostic(bot))
 
 bot.run(BOT_TOKEN)
