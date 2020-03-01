@@ -1,5 +1,6 @@
 import arrow
 import requests
+from discord import Embed
 from discord.ext import commands
 from ics import Calendar
 from utils.secrets import get_secret
@@ -29,19 +30,20 @@ class Events(commands.Cog):
 
         timeline = self.cal.timeline.included(today, seven_days_from_now)
 
-        msg = '**Here are the matches for the next 7 days:**'
+        msg = '__Here are the matches for the next 7 days:__'
 
         if args:
             if args[0] == 'today':
-                msg = '**Here are the matches for today:**'
+                msg = '__Here are the matches for today:__'
                 timeline = self.cal.timeline.today()
 
-        for num, entry in enumerate(timeline):
+        embeds = []
+        for entry in timeline:
 
             title = entry.name
             begin_time = entry.begin.to('US/Eastern').format('ddd MMM Do @ h:mmA')
             time_until = entry.begin.humanize()
-            stream = None
+            stream = 'TBD'
 
             if entry.description:
                 try:
@@ -49,16 +51,14 @@ class Events(commands.Cog):
                 except IndexError:
                     pass
 
-            if num == 0:
-                msg += '\n'
+            embed = Embed(title=title, color=0x874efe)
+            embed.add_field(name='Time', value=f'{begin_time} ET')
+            embed.add_field(name='Countdown', value=time_until)
+            embed.add_field(name='Stream', value=str(stream), inline=False)
+            embeds.append(embed)
 
-            msg += (
-                f'\n__{title}__\n'
-                f'{begin_time} ET\n'
-                f'*{time_until}*\n'
-            )
+        await context.send(msg)
 
-            if stream:
-                msg += f'<{stream}>\n'
+        for embed in embeds:
+            await context.send(embed=embed)
 
-        await context.send(content=msg)
