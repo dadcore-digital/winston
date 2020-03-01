@@ -59,6 +59,6 @@ class Events(commands.Cog):
             )
 
             if stream:
-                msg += f'<{stream}>'
+                msg += f'<{stream}>\n'
 
         await context.send(content=msg)
