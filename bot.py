@@ -3,7 +3,16 @@ from cogs.events import Events
 from utils.secrets import get_secret
 
 BOT_TOKEN = get_secret('BOT_TOKEN')
-bot = commands.Bot(command_prefix=commands.when_mentioned_or('!w '))
+
+async def get_pre(bot, message):
+    prefixes = ['!w ']
+
+    if not message.guild:
+        prefixes.append('')
+
+    return commands.when_mentioned_or(*prefixes)(bot, message)
+
+bot = commands.Bot(command_prefix=get_pre)
 
 bot.add_cog(Events(bot))
 
