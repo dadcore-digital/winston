@@ -3,7 +3,7 @@ from cogs.events import Events
 from utils.secrets import get_secret
 
 BOT_TOKEN = get_secret('BOT_TOKEN')
-bot = commands.Bot(command_prefix=commands.when_mentioned)
+bot = commands.Bot(command_prefix=commands.when_mentioned_or('!w '))
 
 bot.add_cog(Events(bot))
 
