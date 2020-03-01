@@ -2,7 +2,7 @@ import random
 from discord.ext import commands
 
 
-class Diagnostic(commands.Cog):
+class Diagnostics(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
