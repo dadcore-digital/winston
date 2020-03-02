@@ -25,7 +25,10 @@ class Events(commands.Cog):
         ics_data = requests.get(calendar_url).text
         self.cal = Calendar(imports=ics_data)
 
-        today = arrow.utcnow().floor('hour')
+        today = arrow.utcnow().to('US/Eastern').floor('day')
+        end_of_today = today.ceil('day')
+        end_of_today_plus_utc_offset = end_of_today.shift(hours=5).ceil('hour')
+
         seven_days_from_now = arrow.utcnow().shift(days=7).ceil('hour')
 
         timeline = self.cal.timeline.included(today, seven_days_from_now)
@@ -35,19 +38,25 @@ class Events(commands.Cog):
         if args:
             if args[0] == 'today':
                 msg = '__Here are the matches for today:__'
-                timeline = self.cal.timeline.today()
+
+                timeline = self.cal.timeline.included(
+                    today, end_of_today_plus_utc_offset)
 
         embeds = []
         for entry in timeline:
 
             title = entry.name
-            begin_time = entry.begin.to('US/Eastern').format('ddd MMM Do @ h:mmA')
+            title = title.ljust(200 - len(title), ' ')
+            title += '\n'
+            begin_time = entry.begin.to('US/Eastern').format(
+                'ddd MMM Do @ h:mmA')
             time_until = entry.begin.humanize()
             stream = 'TBD'
 
             if entry.description:
                 try:
-                    stream = entry.description.split('[stream]')[1].split('\n')[0].strip()
+                    stream = entry.description.split(
+                        '[stream]')[1].split('\n')[0].strip()
                 except IndexError:
                     pass
 
