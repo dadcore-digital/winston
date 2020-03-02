@@ -14,6 +14,9 @@ class Wiki(commands.Cog):
 
     @commands.command()
     async def wiki(self, context, *args):
+        """
+        Enter the title of a wiki article to (hopefully?) excerpt it.
+        """
         msg = 'No wiki article found'
         embed = None
         query = '+'.join(args)
