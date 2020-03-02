@@ -10,7 +10,7 @@ class Wiki(commands.Cog):
         self.bot = bot
         self.WIKI_BASE_URL = 'https://killerqueenblack.wiki'
         self.SEARCH_URL = f'{self.WIKI_BASE_URL}/_search/?q='
-        self.TRUNCATE_AT = 250
+        self.TRUNCATE_AT = 500
 
     @commands.command()
     async def wiki(self, context, *args):
@@ -42,10 +42,23 @@ class Wiki(commands.Cog):
             doc = pq(resp.content)
             article = doc('.wiki-article')
 
+            # Remove related articles and table of contents if present
+            article = article.remove('.article-list').remove('.toc')
+
+            # Apply markdown formatting to HTML header levels
+            for header in article.find('h1'):
+                header.text = f'**{header.text}**'
+
+            for header in article.find('h2'):
+                header.text = f'*{header.text}*'
+
+            for header in article.find('h3'):
+                header.text = f'*{header.text}*'
+
             if article:
                 article_title = doc('title').text().split('-')[0].strip()
                 article_text = article[0].text_content().strip()
-                article_text = re.sub(r'\n\n\n+', '', article_text)
+                article_text = re.sub(r'\n\n\n+', '\n', article_text)
                 article_text = article_text[:self.TRUNCATE_AT]
                 article_link = result_url
 
