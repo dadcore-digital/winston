@@ -1,8 +1,11 @@
+#! /home/ianfitzpatrick/apps/winston_bot/env/bin/python
+
 from discord.ext import commands
 from cogs.events import Events
 from utils.secrets import get_secret
 
 BOT_TOKEN = get_secret('BOT_TOKEN')
+
 
 async def get_pre(bot, message):
     prefixes = ['!w ']
