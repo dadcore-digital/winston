@@ -54,7 +54,6 @@ class Events(commands.Cog):
             time_until = entry.begin.humanize()
             stream = 'TBD'
 
-
             embed = Embed(title=title, color=0x874efe)
             embed.add_field(name='Time', value=f'{begin_time} ET')
             embed.add_field(name='Countdown', value=time_until)
@@ -71,7 +70,7 @@ class Events(commands.Cog):
                     val = val.strip()
                     maybe_html = pq(val)
 
-                    if maybe_html('a'):
+                    if maybe_html('a') and not val.startswith('http'):
                         val = maybe_html('a')[0].attrib['href']
 
                     embed.add_field(name=field, value=val, inline=False)
