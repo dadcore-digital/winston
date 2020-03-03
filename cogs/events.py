@@ -1,5 +1,6 @@
 import arrow
 import requests
+from pyquery import PyQuery as pq
 from discord import Embed
 from discord.ext import commands
 from ics import Calendar
@@ -53,21 +54,31 @@ class Events(commands.Cog):
             time_until = entry.begin.humanize()
             stream = 'TBD'
 
-            if entry.description:
-                try:
-                    stream = entry.description.split(
-                        '[stream]')[1].split('\n')[0].strip()
-                except IndexError:
-                    pass
 
             embed = Embed(title=title, color=0x874efe)
             embed.add_field(name='Time', value=f'{begin_time} ET')
             embed.add_field(name='Countdown', value=time_until)
-            embed.add_field(name='Stream', value=str(stream), inline=False)
+
+            if entry.description:
+                description_lines = entry.description.split('<br>')
+
+                for line in description_lines:
+                    field, val = line.split(']')
+                    field = field.replace('[', '').strip()
+                    if not field.isupper():
+                        field = field.capitalize()
+
+                    val = val.strip()
+                    maybe_html = pq(val)
+
+                    if maybe_html('a'):
+                        val = maybe_html('a')[0].attrib['href']
+
+                    embed.add_field(name=field, value=val, inline=False)
+
             embeds.append(embed)
 
         await context.send(msg)
 
         for embed in embeds:
             await context.send(embed=embed)
-
