@@ -59,21 +59,30 @@ class Events(commands.Cog):
             embed.add_field(name='Countdown', value=time_until)
 
             if entry.description:
-                description_lines = entry.description.split('<br>')
+
+                # Handle inconsistent line breaks and split into list
+                description_lines = entry.description.replace('<br>', '\n')
+                description_lines = entry.description.split('\n')
 
                 for line in description_lines:
-                    field, val = line.split(']')
-                    field = field.replace('[', '').strip()
-                    if not field.isupper():
-                        field = field.capitalize()
 
-                    val = val.strip()
-                    maybe_html = pq(val)
+                    try:
+                        field, val = line.split(']')
+                        field = field.replace('[', '').strip()
+                        if not field.isupper():
+                            field = field.capitalize()
 
-                    if maybe_html('a') and not val.startswith('http'):
-                        val = maybe_html('a')[0].attrib['href']
+                        val = val.strip()
+                        maybe_html = pq(val)
 
-                    embed.add_field(name=field, value=val, inline=False)
+                        if maybe_html('a') and not val.startswith('http'):
+                            val = maybe_html('a')[0].attrib['href']
+
+                        embed.add_field(name=field, value=val, inline=False)
+
+                    # Problem with line or no lines
+                    except ValueError:
+                        pass
 
             embeds.append(embed)
 
