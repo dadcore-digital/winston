@@ -11,7 +11,7 @@ BOT_TOKEN = get_secret('BOT_TOKEN')
 
 
 async def get_pre(bot, message):
-    prefixes = ['!w ']
+    prefixes = ['!']
 
     if not message.guild:
         prefixes.append('')
