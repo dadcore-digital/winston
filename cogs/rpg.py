@@ -2,28 +2,19 @@ from random import randint
 import re
 import requests
 from pyquery import PyQuery as pq
+import discord
 from discord import Embed
 from discord.ext import commands
 
 
 class Dice(commands.Cog):
 
-    def __init__(self, bot):
-        self.d6 = [
-            '<:d61:720736504745558056>',
-            '<:d62:720737138391646370>',
-            '<:d63:720737138294915104>',
-            '<:d64:720737138672402452>',
-            '<:d65:720737138613944340>',
-            '<:d66:720737138706219128>'
-        ]
-
     @commands.command()
     async def roll(self, context, *args):
         """
         Roll a die and display result.
         """
-
+        emoji = discord.utils.get(context.bot.guilds[0].emojis, name='d61')
         try:
             dice_quantity, dice_type = args[0].split('d')
             dice_type = int(dice_type)
@@ -40,7 +31,11 @@ class Dice(commands.Cog):
 
         msg = ''
         for result in rolls:
-            msg += getattr(self, f'd{dice_type}')[result - 1]
+            emoji = discord.utils.get(
+                context.bot.guilds[0].emojis,
+                name=f'd{dice_type}{result}'
+            )
+            msg += str(emoji)
 
         await context.send(msg)
 
