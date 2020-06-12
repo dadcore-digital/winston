@@ -14,31 +14,34 @@ class Dice(commands.Cog):
         """
         Roll a die and display result.
         """
-        emoji = discord.utils.get(context.bot.guilds[0].emojis, name='d61')
-        try:
-            dice_quantity, dice_type = args[0].split('d')
-            dice_type = int(dice_type)
-            dice_quantity = int(dice_quantity)
-
-        except ValueError:
-            dice_quantity = 1
-
-        rolls = []
-        for roll_number in range(dice_quantity):
-            rolls.append(
-                randint(1, dice_type)
-            )
 
         msg = ''
-        for result in rolls:
-            emoji = discord.utils.get(
-                context.bot.guilds[0].emojis,
-                name=f'd{dice_type}_{result}'
-            )
-            msg += str(emoji)
+        total = 0
+
+        for arg in args:
+            try:
+                dice_quantity, dice_type = arg.split('d')
+                dice_type = int(dice_type)
+                dice_quantity = int(dice_quantity)
+
+            except ValueError:
+                dice_quantity = 1
+
+            rolls = []
+            for roll_number in range(dice_quantity):
+                result = randint(1, dice_type)
+                total += result
+                rolls.append(result)
+
+            for result in rolls:
+                emoji = discord.utils.get(
+                    context.bot.guilds[0].emojis,
+                    name=f'd{dice_type}_{result}'
+                )
+                msg += str(emoji)
 
         await context.send(msg)
 
-        if dice_quantity > 1:
-            total = f'\nTotal: **{sum(rolls)}**'
-            await context.send(total)
+        if dice_quantity > 1 or len(args) > 1:
+            total_msg = f'\nTotal: **{total}**'
+            await context.send(total_msg)
