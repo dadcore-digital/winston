@@ -33,7 +33,7 @@ class Dice(commands.Cog):
         for result in rolls:
             emoji = discord.utils.get(
                 context.bot.guilds[0].emojis,
-                name=f'd{dice_type}{result}'
+                name=f'd{dice_type}_{result}'
             )
             msg += str(emoji)
 
