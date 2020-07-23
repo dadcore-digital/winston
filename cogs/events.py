@@ -4,7 +4,7 @@ from pyquery import PyQuery as pq
 from discord import Embed
 from discord.ext import commands
 from ics import Calendar
-from utils.secrets import get_secret
+from services.secrets import get_secret
 
 
 class Events(commands.Cog):
@@ -14,34 +14,20 @@ class Events(commands.Cog):
     @commands.command()
     async def matches(self, context, *args):
         """
-        Show matches for the upcoming 7 days.
-
-        To see just all of today's matches, try:
-
-            matches today
-
+        Show all matches in next 24 hours.
         """
 
         calendar_url = get_secret('MATCH_CALENDAR_ICS')
         ics_data = requests.get(calendar_url).text
         self.cal = Calendar(imports=ics_data)
 
-        today = arrow.utcnow().to('US/Eastern').floor('day')
-        end_of_today = today.ceil('day')
-        end_of_today_plus_utc_offset = end_of_today.shift(hours=5).ceil('hour')
+        now = arrow.utcnow()
+        this_time_tomorrow = now.shift(hours=24)
 
-        seven_days_from_now = arrow.utcnow().shift(days=7).ceil('hour')
+        msg = '__Here are the matches for the next 24 hours:__'
 
-        timeline = self.cal.timeline.included(today, seven_days_from_now)
-
-        msg = '__Here are the matches for the next 7 days:__'
-
-        if args:
-            if args[0] == 'today':
-                msg = '__Here are the matches for today:__'
-
-                timeline = self.cal.timeline.included(
-                    today, end_of_today_plus_utc_offset)
+        timeline = self.cal.timeline.included(
+            now, this_time_tomorrow)
 
         embeds = []
         for entry in timeline:
@@ -61,28 +47,10 @@ class Events(commands.Cog):
             if entry.description:
 
                 # Handle inconsistent line breaks and split into list
-                description_lines = entry.description.replace('<br>', '\n')
-                description_lines = entry.description.split('\n')
+                description = entry.description.replace('<br>', '\n')
+                # description = entry.description.split('\n')
 
-                for line in description_lines:
-
-                    try:
-                        field, val = line.split(']')
-                        field = field.replace('[', '').strip()
-                        if not field.isupper():
-                            field = field.capitalize()
-
-                        val = val.strip()
-                        maybe_html = pq(val)
-
-                        if maybe_html('a') and not val.startswith('http'):
-                            val = maybe_html('a')[0].attrib['href']
-
-                        embed.add_field(name=field, value=val, inline=False)
-
-                    # Problem with line or no lines
-                    except ValueError:
-                        pass
+                embed.add_field(name='Details', value=description, inline=False)
 
             embeds.append(embed)
 

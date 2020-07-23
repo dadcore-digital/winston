@@ -2,7 +2,6 @@ import os
 import json
 from pathlib import Path
 
-
 def get_secret(secret_name):
     """
     Get secret variable or return explicit exception.

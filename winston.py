@@ -5,7 +5,7 @@ from cogs.events import Events
 from cogs.wiki import Wiki
 from cogs.rpg import Dice
 from cogs.autoresponder import AutoResponder
-from utils.secrets import get_secret
+from services.secrets import get_secret
 
 BOT_TOKEN = get_secret('BOT_TOKEN')
 
