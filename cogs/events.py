@@ -54,11 +54,13 @@ class Events(commands.Cog):
 
             embeds.append(embed)
 
-        await context.send(msg)
 
         # Only Show next upcoming match if 'next' argument passed
         if 'next' in args:
             embeds = embeds[:1]
+            msg = '__Here is next upcoming match:__'
+
+        await context.send(msg)
 
         for embed in embeds:
             await context.send(embed=embed)
