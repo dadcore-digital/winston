@@ -1,11 +1,12 @@
+import io
+import sys
 from random import randint
 import re
-import requests
 from pyquery import PyQuery as pq
 import discord
 from discord import Embed
 from discord.ext import commands
-
+from services.dice import build_dice_roll_image
 
 class Dice(commands.Cog):
 
@@ -17,7 +18,8 @@ class Dice(commands.Cog):
 
         msg = ''
         total = 0
-
+        rolls = []
+        
         for arg in args:
             try:
                 dice_quantity, dice_type = arg.split('d')
@@ -27,20 +29,22 @@ class Dice(commands.Cog):
             except ValueError:
                 dice_quantity = 1
 
-            rolls = []
             for roll_number in range(dice_quantity):
                 result = randint(1, dice_type)
                 total += result
-                rolls.append(result)
+                rolls.append(f'd{dice_type}_{result}') 
 
-            for result in rolls:
-                emoji = discord.utils.get(
-                    context.bot.guilds[0].emojis,
-                    name=f'd{dice_type}_{result}'
-                )
-                msg += str(emoji)
+        # Let's be reasonable.        
+        if len(rolls) > 100:
+            return None
 
-        await context.send(msg)
+        # Avoid writing image to disk
+        image = build_dice_roll_image(rolls)
+        image_as_buffer = io.BytesIO()
+        image.save(image_as_buffer, format='PNG')
+        image_as_buffer.seek(0)
+
+        await context.send(file=discord.File(image_as_buffer, 'roll.png'))
 
         if dice_quantity > 1 or len(args) > 1:
             total_msg = f'\nTotal: **{total}**'
