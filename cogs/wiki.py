@@ -18,6 +18,8 @@ class Wiki(commands.Cog):
         Enter the title of a wiki article to (hopefully?) excerpt it.
         """
         msg = 'No wiki article found'
+        other_results = ''
+
         embed = None
         query = '+'.join(args)
         search_url = self.SEARCH_URL + query
@@ -25,7 +27,7 @@ class Wiki(commands.Cog):
         resp = requests.get(search_url)
         doc = pq(resp.content)
         result_links = doc('.table-striped tr').find('a')
-
+        
         if result_links:
             query_as_path = query.replace('+', '-')
 
@@ -36,9 +38,10 @@ class Wiki(commands.Cog):
             # any search result links, select this result instead.
             for link in result_links:
                 if link.attrib:
-                    if query_as_path in link.attrib['href']:
-                        result_path = link.attrib['href']
-                        break
+                    if 'href' in link.attrib.keys():
+                        if query_as_path in link.attrib['href']:
+                            result_path = link.attrib['href']
+                            break
 
             result_url = f'{self.WIKI_BASE_URL}{result_path}'
             resp = requests.get(result_url)
@@ -71,8 +74,20 @@ class Wiki(commands.Cog):
                 embed = Embed(title=article_title, color=0x009051, url=article_link)
                 embed.add_field(name='Summary', value=article_text, inline=False)
 
+                # Give top 5 results
+                
+                if len(result_links) > 1:
+                    other_results = "*All Results:*  "
 
+                    for link in result_links:
+                        if link.attrib:
+                            if 'href' in link.attrib.keys():
+                                other_results += f'<{self.WIKI_BASE_URL}{link.attrib["href"]}>, '
+                    
+                    other_results = other_results.rstrip(', ') 
         if embed:
             await context.send(embed=embed)
+            if other_results:
+                await context.send(other_results, embed=None)
         else:
             await context.send(msg)
