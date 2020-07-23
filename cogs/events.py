@@ -14,7 +14,7 @@ class Events(commands.Cog):
     @commands.command()
     async def matches(self, context, *args):
         """
-        Show all matches in next 24 hours.
+        Show all matches in next 24 hours. Try `matches next` to see just next upcoming match.
         """
 
         calendar_url = get_secret('MATCH_CALENDAR_ICS')
@@ -55,6 +55,10 @@ class Events(commands.Cog):
             embeds.append(embed)
 
         await context.send(msg)
+
+        # Only Show next upcoming match if 'next' argument passed
+        if 'next' in args:
+            embeds = embeds[:1]
 
         for embed in embeds:
             await context.send(embed=embed)
