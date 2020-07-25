@@ -29,7 +29,7 @@ class Events(commands.Cog):
         timeline = self.cal.timeline.included(
             now, this_time_tomorrow)
 
-        embeds = []
+        matches = []
         for entry in timeline:
 
             title = entry.name
@@ -52,15 +52,28 @@ class Events(commands.Cog):
 
                 embed.add_field(name='Details', value=description, inline=False)
 
-            embeds.append(embed)
+            matches.append({'begin_time': begin_time, 'embed': embed})
 
 
         # Only Show next upcoming match if 'next' argument passed
         if 'next' in args:
-            embeds = embeds[:1]
-            msg = '__Here is next upcoming match:__'
+            just_next_matches = []
+            
+            for idx, match in enumerate(matches):
+                if idx == 0:
+                    just_next_matches.append(match)
+                else:
+                    if match['begin_time'] == matches[0]['begin_time']:
+                        just_next_matches.append(match)
 
+            if len(matches) == 1: 
+                msg = '__Here is next upcoming match:__'
+            else:
+                msg = '__Here are the next upcoming matches (double-booked):__'
+            
+            matches = just_next_matches
+        
         await context.send(msg)
 
-        for embed in embeds:
-            await context.send(embed=embed)
+        for match in matches:
+            await context.send(embed=match['embed'])
