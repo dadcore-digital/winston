@@ -13,7 +13,7 @@ class Dice(commands.Cog):
     @commands.command()
     async def roll(self, context, *args):
         """
-        Roll a die and display result.
+        Roll some dice! Try: !roll d20, or !roll 2d6 5d8 4d20 3d12
         """
 
         msg = ''
