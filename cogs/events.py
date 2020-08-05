@@ -37,7 +37,7 @@ class Events(commands.Cog):
             title += '\n'
             begin_time = entry.begin.to('US/Eastern').format(
                 'ddd MMM Do @ h:mmA')
-            time_until = entry.begin.humanize()
+            time_until = entry.begin.humanize(granularity=['hour', 'minute'])
             stream = 'TBD'
 
             embed = Embed(title=title, color=0x874efe)
