@@ -1,6 +1,6 @@
 import io
 import sys
-from random import randint
+from random import randint, choice
 import re
 from pyquery import PyQuery as pq
 import discord
@@ -20,11 +20,37 @@ class Dice(commands.Cog):
         total = 0
         rolls = []
         
+        invalid_dice_messages = [
+            "Terribly sorry, adventure to all the fantastic worlds you want, but your dice types must be of a non-fantasy nature.",
+            "Invented dice are strictly frowned upon.",
+            "Dice of the imagination are best left in that realm.",
+            "Do not trifle with the dice god! Your dice are invalid. Good day!",
+            "What non-euclidean are you trying to get me to roll? I am not a cthulhu.",
+            "Nah, hard pass."
+        ]
+        
+        valid_dice_types = [4, 6, 8, 10, 12, 20]
+
+        excessive_roll_messages = [
+            "Pardon me, but if I may say, that is an excessive amount of dice rolls.",
+            "I cannot permit a fireball of that magnitude.",
+            "Your meta-gaming is getting out of hand, I cannot in good conscience execute this roll.",
+            "I love your moxy, but no. Just no.",
+            "NERP!",
+        ]
+
         for arg in args:
             try:
                 dice_quantity, dice_type = arg.split('d')
                 dice_type = int(dice_type)
+            
+                if dice_type not in valid_dice_types:
+                    await context.send(choice(invalid_dice_messages))
+                    return None
+
                 dice_quantity = int(dice_quantity)
+
+
 
             except ValueError:
                 dice_quantity = 1
@@ -36,6 +62,7 @@ class Dice(commands.Cog):
 
         # Let's be reasonable.        
         if len(rolls) > 100:
+            await context.send(choice(excessive_roll_messages))
             return None
 
         # Avoid writing image to disk
