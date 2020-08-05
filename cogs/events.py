@@ -66,12 +66,14 @@ class Events(commands.Cog):
                     if match['begin_time'] == matches[0]['begin_time']:
                         just_next_matches.append(match)
 
+            matches = just_next_matches
+
             if len(matches) == 1: 
                 msg = '__Here is next upcoming match:__'
             else:
                 msg = '__Here are the next upcoming matches (double-booked):__'
             
-            matches = just_next_matches
+            
         
         await context.send(msg)
 
