@@ -29,7 +29,7 @@ class Dice(commands.Cog):
             "Nah, hard pass."
         ]
         
-        valid_dice_types = [4, 6, 8, 10, 12, 20]
+        valid_dice_types = [4, 6, 8, 10, 12, 20, 100, 1000]
 
         excessive_roll_messages = [
             "Pardon me, but if I may say, that is an excessive amount of dice rolls.",
