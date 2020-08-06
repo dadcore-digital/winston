@@ -7,6 +7,8 @@ def answer_flip_question(call, result, question):
     """
     Provide an answer to a question asked via coin flip.
 
+    The logic here is absolute spaghetti code and I need to fix it.
+
     Arguments:
     call -- The 'heads' or 'snails' prediction user made. (str)
     result -- Flipped result of coin, 'heads' or 'snails'. (str)
@@ -68,6 +70,10 @@ def answer_flip_question(call, result, question):
         if question.startswith('play on'):
             question =f'you **should** {question}'
         
+        # Total hack to fix double "you shoulds"
+        question = question.replace(
+            'you **should** you **should**', 'you **should**')
+
         return f'{choice(yes_variations)}, {question}'
     
     else:
@@ -85,6 +91,10 @@ def answer_flip_question(call, result, question):
             question =f'you **shouldn\'t** {question}'
 
         question = f'{choice(no_variations)}, {question}'
+
+        # Total hack to fix double "you shouldnt's"
+        question = question.replace(
+            'you **shouldn\'t** you **shouldn\'t**', 'you **shouldn\'t**')
 
         return question
 
