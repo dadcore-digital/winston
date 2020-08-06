@@ -112,8 +112,7 @@ class Chance(commands.Cog):
         
         # Check for question argument 
         if len(args) > 1:
-            if args[1] == 'if':
-                msg = answer_flip_question(call, result, args[2:])
+            msg = answer_flip_question(call, result, args[1:])
 
         elif call:
             if call == result:

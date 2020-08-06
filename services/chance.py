@@ -16,39 +16,74 @@ def answer_flip_question(call, result, question):
     yes = call == result
 
     yes_variations = [
-        '**YERP**'
-        'Obviously **yes**',
-        'It\'s clear to everyone here that **YEP**',
-        '**Yes yes yes**',
-        'Indubitably, **yes**',
-        'Fo sho **yeah**',
-        'You knew it all along, but **yes**',
+        'YERP',
+        'Obviously yes',
+        'It\'s clear to everyone here that YEP',
+        'Yes yes yes',
+        'Indubitably, yes',
+        'Fo sho yeah',
+        'You knew it all along, but yes',
+        "Awwwwwwwwww yeaaaaaaah"
     ]
 
     no_variations = [
-        '**NERP**',
-        '**Negatory**',
-        '**No no no no no no no no**',
-        '**Noooooooooooooooooo**',
-        'Quite **no** I\'m afraid',
-        '**Nope**',
+        'NERP',
+        'Negatory',
+        'No no no no no no no no',
+        'Noooooooooooooooooo',
+        'Quite no I\'m afraid',
+        'Nope',
         'You knew the answer in your heart was **no**, and you were right',
     ]
+
+    servers = [
+        'east', 'west', 'central', 'japan', 'australia', 'oceania', 'europe'
+    ]
+
+    starts_with_words = ['you', 'i', 'we', 'play on', 'should']
 
     # Fix pronouns
     question = re.sub(r'^i ', 'you ', question, flags=re.IGNORECASE)
     question = re.sub(r'^we ', 'you ', question, flags=re.IGNORECASE)
 
+    # If requesting to play on server like !flip heads west, make answer verbose
+    if question.startswith(tuple(servers)):
+        question = f'play on {question}'
+
+
     # Add punctuation
     question = question.rstrip('?').rstrip('!')
     question = f'{question}.'
+
+    needs_prepend = not question.startswith(tuple(starts_with_words))
     
     if yes:
+        question = question.replace('should i', 'you **should**')
+        question = question.replace('should I', 'you **should**')
+        question = question.replace('should', '**should**')
+        
+        if needs_prepend:
+            question = f'you **should** {question}'
+        
+        if question.startswith('play on'):
+            question =f'you **should** {question}'
+        
         return f'{choice(yes_variations)}, {question}'
+    
     else:
         # Negate some common words before returning answer
-        question = question.replace('should', 'shouldn\'t')
+
+        question = question.replace('should i', 'you **shouldn\'t**')
+        question = question.replace('should I', 'you **shouldn\'t**')
+
+        question = question.replace(' should ', ' **shouldn\'t** ')
         question = question.replace('is ', 'isn\'t ')
+
+        if needs_prepend:
+            question = f'you **shouldn\'t** {question}'
+
+        if question.startswith('play on'):
+            question =f'you **shouldn\'t** {question}'
 
         question = f'{choice(no_variations)}, {question}'
 
