@@ -7,9 +7,10 @@ from pyquery import PyQuery as pq
 import discord
 from discord import Embed
 from discord.ext import commands
-from services.chance import build_dice_roll_image, get_coin_flip_image
+from services.chance import (
+    build_dice_roll_image, get_coin_flip_image, answer_flip_question)
 
-class Dice(commands.Cog):
+class Chance(commands.Cog):
 
     @commands.command()
     async def roll(self, context, *args):
@@ -78,9 +79,6 @@ class Dice(commands.Cog):
             total_msg = f'\nTotal: **{total}**'
             await context.send(total_msg)
 
-
-class Flip(commands.Cog):
-    
     @commands.command()
     async def flip(self, context, *args):
         """
@@ -99,6 +97,7 @@ class Flip(commands.Cog):
         result = choice(sides)
         call = ''
 
+        # Weed out naughty flips
         if args:
             call = args[0]
             if call not in sides:
@@ -110,7 +109,13 @@ class Flip(commands.Cog):
                     return None
 
         msg = ''
-        if call:
+        
+        # Check for question argument 
+        if len(args) > 1:
+            if args[1] == 'if':
+                msg = answer_flip_question(call, result, args[2:])
+
+        elif call:
             if call == result:
                 msg = f"Very good, it is indeed **{result}**."
             else:

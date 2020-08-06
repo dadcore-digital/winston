@@ -1,5 +1,58 @@
+import re
 import sys
+from random import choice
 from PIL import Image
+
+def answer_flip_question(call, result, question):
+    """
+    Provide an answer to a question asked via coin flip.
+
+    Arguments:
+    call -- The 'heads' or 'snails' prediction user made. (str)
+    result -- Flipped result of coin, 'heads' or 'snails'. (str)
+    question -- Question text to respond to.
+    """
+    question = ' '.join(question)
+    yes = call == result
+
+    yes_variations = [
+        '**YERP**'
+        'Obviously **yes**',
+        'It\'s clear to everyone here that **YEP**',
+        '**Yes yes yes**',
+        'Indubitably, **yes**',
+        'Fo sho **yeah**',
+        'You knew it all along, but **yes**',
+    ]
+
+    no_variations = [
+        '**NERP**',
+        '**Negatory**',
+        '**No no no no no no no no**',
+        '**Noooooooooooooooooo**',
+        'Quite **no** I\'m afraid',
+        '**Nope**',
+        'You knew the answer in your heart was **no**, and you were right',
+    ]
+
+    # Fix pronouns
+    question = re.sub(r'^i ', 'you ', question, flags=re.IGNORECASE)
+    question = re.sub(r'^we ', 'you ', question, flags=re.IGNORECASE)
+
+    # Add punctuation
+    question = question.rstrip('?').rstrip('!')
+    question = f'{question}.'
+    
+    if yes:
+        return f'{choice(yes_variations)}, {question}'
+    else:
+        # Negate some common words before returning answer
+        question = question.replace('should', 'shouldn\'t')
+        question = question.replace('is ', 'isn\'t ')
+
+        question = f'{choice(no_variations)}, {question}'
+
+        return question
 
 def build_dice_roll_image(
     rolls, total_width=1120, row_height=160, dice_per_row=6):

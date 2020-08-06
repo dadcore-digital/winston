@@ -3,7 +3,7 @@
 from discord.ext import commands
 from cogs.events import Events
 from cogs.wiki import Wiki
-from cogs.chance import Dice, Flip
+from cogs.chance import Chance
 from cogs.autoresponder import AutoResponder
 from services.secrets import get_secret
 
@@ -23,7 +23,6 @@ bot = commands.Bot(command_prefix=get_pre)
 bot.add_cog(Events(bot))
 bot.add_cog(Wiki(bot))
 bot.add_cog(AutoResponder(bot))
-bot.add_cog(Dice(bot))
-bot.add_cog(Flip(bot))
+bot.add_cog(Chance(bot))
 
 bot.run(BOT_TOKEN)
