@@ -56,45 +56,62 @@ def answer_flip_question(call, result, question):
     # Add punctuation
     question = question.rstrip('?').rstrip('!')
     question = f'{question}.'
-
-    needs_prepend = not question.startswith(tuple(starts_with_words))
     
     if yes:
-        question = question.replace('should i', 'you **should**')
-        question = question.replace('should I', 'you **should**')
-        question = question.replace(' should ', ' **should** ')
-        
+        if question.lower().startswith(
+            ('should i', 'should i', 'should we')
+        ):
+            question = question.replace('should i', 'you **should**')
+            question = question.replace('should I', 'you **should**')
+            question = question.replace('should we', 'you **should**')
+        elif question.lower().startswith('should'):
+            proper_noun = question.split(' ')[1]
+            question = question.replace(proper_noun, '')
+            question = question.replace('should', f'{proper_noun} **should**')
+
+        try:
+            needs_prepend = (
+                not question.startswith(tuple(starts_with_words)) and
+                not question.split(' ')[1] == '**should**'
+            ) 
+        except IndexError:
+            needs_prepend = True
+
         if needs_prepend:
             question = f'you **should** {question}'
         
         if question.startswith('play on'):
             question =f'you **should** {question}'
         
-        # Total hack to fix double "you shoulds"
-        question = question.replace(
-            'you **should** you **should**', 'you **should**')
-
         return f'{choice(yes_variations)}, {question}'
     
     else:
-        # Negate some common words before returning answer
-        question = question.replace('should i', 'you **shouldn\'t**')
-        question = question.replace('should I', 'you **shouldn\'t**')
+        if question.lower().startswith(
+            ('should i', 'should i', 'should we')
+        ):
+            question = question.replace('should i', 'you **shouldn\'t**')
+            question = question.replace('should I', 'you **shouldn\'t**')
+            question = question.replace('should we', 'you **shouldn\'t**')
+        elif question.lower().startswith('should'):
+            proper_noun = question.split(' ')[1]
+            question = question.replace(proper_noun, '')
+            question = question.replace('should', f'{proper_noun} **shouldn\'t**')
 
-        question = question.replace(' should ', ' **shouldn\'t** ')
-        question = question.replace('is ', 'isn\'t ')
+        try:
+            needs_prepend = (
+                not question.startswith(tuple(starts_with_words)) and
+                not question.split(' ')[1] == '**shouldn\'t**'
+            ) 
+        except IndexError:
+            needs_prepend = True
 
         if needs_prepend:
             question = f'you **shouldn\'t** {question}'
-
+        
         if question.startswith('play on'):
             question =f'you **shouldn\'t** {question}'
-
-        question = f'{choice(no_variations)}, {question}'
-
-        # Total hack to fix double "you shouldnt's"
-        question = question.replace(
-            'you **shouldn\'t** you **shouldn\'t**', 'you **shouldn\'t**')
+        
+        return f'{choice(no_variations)}, {question}'
 
         return question
 
