@@ -54,7 +54,7 @@ def answer_flip_question(call, result, question):
 
 
     # Add punctuation
-    question = question.rstrip('?').rstrip('!')
+    question = question.rstrip('?').rstrip('!').rstrip('.')
     question = f'{question}.'
     
     if yes:
