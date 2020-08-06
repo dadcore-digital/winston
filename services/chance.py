@@ -45,7 +45,6 @@ def combine_images(
 
     new_im = Image.new('RGBA', (total_width, total_height), color=bg_color)
 
-
     y = 0
 
     for idx, row in enumerate(rows):
@@ -58,3 +57,13 @@ def combine_images(
 
     return new_im
 
+def get_coin_flip_image(side):
+    """
+    Return full path to image of a coin flip given the side it should land on.
+
+    Arguments:
+    side -- Side of coin to show. 'heads' or 'snails' (str)
+    """
+    if side not in ['heads', 'snails']:
+        raise ValueERror
+    return f'{sys.path[0]}/services/assets/{side}.gif'

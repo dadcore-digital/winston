@@ -1,3 +1,4 @@
+import asyncio
 import io
 import sys
 from random import randint, choice
@@ -6,7 +7,7 @@ from pyquery import PyQuery as pq
 import discord
 from discord import Embed
 from discord.ext import commands
-from services.dice import build_dice_roll_image
+from services.chance import build_dice_roll_image, get_coin_flip_image
 
 class Dice(commands.Cog):
 
@@ -76,3 +77,47 @@ class Dice(commands.Cog):
         if dice_quantity > 1 or len(args) > 1:
             total_msg = f'\nTotal: **{total}**'
             await context.send(total_msg)
+
+
+class Flip(commands.Cog):
+    
+    @commands.command()
+    async def flip(self, context, *args):
+        """
+        Flip a coin. Two choices: !flip heads OR !flip snails. 
+        """
+        sides = ['heads', 'snails']
+
+        invalid_side_errors = [
+            'I do not recognize the legitmacy of that call.',
+            'Call a side. No, not that one.',
+            'I love you, but you are making a mockery of the process!',
+            'Respect the game, dawg.',
+            'Oh so we can just MAKE UP sides now huh? DENIED.'
+        ]
+
+        result = choice(sides)
+        call = ''
+
+        if args:
+            call = args[0]
+            if call not in sides:
+                if call == 'tails':
+                    await context.send(f'This is terribly awkward, but I think you meant to say *snails*, perhaps?')
+                    return None
+                else:
+                    await context.send(choice(invalid_side_errors))
+                    return None
+
+        msg = ''
+        if call:
+            if call == result:
+                msg = f"Very good, it is indeed **{result}**."
+            else:
+                msg = f"Dreadfully sorry, but that's **{result}**."
+
+        image = get_coin_flip_image(result)
+        await context.send(file=discord.File(image, 'flip.gif'))
+        if msg:
+            await asyncio.sleep(4)
+            await context.send(msg)
