@@ -62,7 +62,7 @@ def answer_flip_question(call, result, question):
     if yes:
         question = question.replace('should i', 'you **should**')
         question = question.replace('should I', 'you **should**')
-        question = question.replace('should', '**should**')
+        question = question.replace(' should ', ' **should** ')
         
         if needs_prepend:
             question = f'you **should** {question}'
