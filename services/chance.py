@@ -40,7 +40,7 @@ def answer_flip_question(call, result, question):
         'east', 'west', 'central', 'japan', 'australia', 'oceania', 'europe'
     ]
 
-    starts_with_words = ['you', 'i', 'we', 'play on', 'should']
+    starts_with_words = ['you', 'i', 'we', 'play on']
 
     # Fix pronouns
     question = re.sub(r'^i ', 'you ', question, flags=re.IGNORECASE)
@@ -72,7 +72,6 @@ def answer_flip_question(call, result, question):
     
     else:
         # Negate some common words before returning answer
-
         question = question.replace('should i', 'you **shouldn\'t**')
         question = question.replace('should I', 'you **shouldn\'t**')
 
