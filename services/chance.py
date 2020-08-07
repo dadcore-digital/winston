@@ -59,7 +59,7 @@ def answer_flip_question(call, result, question):
         },  
         {
             'stem': 'should we',
-            'positive': 'you **should*',
+            'positive': 'you **should**',
             'negative': 'you **shouldn\'t**'
         },
         {
@@ -75,7 +75,7 @@ def answer_flip_question(call, result, question):
         {
             'stem': 'play on',
             'positive': 'you **should** play on',
-            'negative': 'you **shouldn\'t* play on'
+            'negative': 'you **shouldn\'t** play on'
         }        
     ]
     
