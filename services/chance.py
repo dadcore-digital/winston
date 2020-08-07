@@ -43,7 +43,7 @@ def answer_flip_question(call, result, question):
         'east', 'west', 'central', 'japan', 'australia', 'oceania', 'europe'
     ]
 
-    starts_with_words = ['you', 'i', 'we', 'play on']
+    starts_with_words = ['you', 'i', 'we', 'play on', 'is', 'are', 'it', 'we']
 
     # Fix pronouns
     question = re.sub(r'^i ', 'you ', question, flags=re.IGNORECASE)
@@ -65,6 +65,10 @@ def answer_flip_question(call, result, question):
             question = question.replace('should i', 'you **should**')
             question = question.replace('should I', 'you **should**')
             question = question.replace('should we', 'you **should**')
+        elif question.lower().startswith('is'):
+            question = question.lower().replace('is it', 'it **is** ', 1)
+        elif question.lower().startswith('are we'):
+            question = question.lower().replace('are we', 'you **are** ', 1)
         elif question.lower().startswith('should'):
             proper_noun = question.split(' ')[1]
             question = question.replace(proper_noun, '')
@@ -72,7 +76,7 @@ def answer_flip_question(call, result, question):
 
         try:
             needs_prepend = (
-                not question.startswith(tuple(starts_with_words)) and
+                not question.lower().startswith(tuple(starts_with_words)) and
                 not question.split(' ')[1] == '**should**'
             ) 
         except IndexError:
@@ -93,6 +97,10 @@ def answer_flip_question(call, result, question):
             question = question.replace('should i', 'you **shouldn\'t**')
             question = question.replace('should I', 'you **shouldn\'t**')
             question = question.replace('should we', 'you **shouldn\'t**')
+        elif question.lower().startswith('is'):
+            question = question.lower().replace('is it', 'it **isn\'t** ', 1)
+        elif question.lower().startswith('are we'):
+            question = question.lower().replace('are we', 'you **aren\'t** ', 1)
         elif question.lower().startswith('should'):
             proper_noun = question.split(' ')[1]
             question = question.replace(proper_noun, '')
