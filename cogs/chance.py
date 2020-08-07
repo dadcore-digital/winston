@@ -84,7 +84,6 @@ class Chance(commands.Cog):
         """
         Flip a coin. Two choices: !flip heads OR !flip snails. 
         """
-        
         sides = ['heads', 'snails']
 
         invalid_side_errors = [

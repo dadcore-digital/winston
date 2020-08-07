@@ -96,6 +96,10 @@ def answer_flip_question(call, result, question):
     if question.lower().startswith('should'):
         pronoun_or_name = question.split(' ')[1]
 
+        # We will need to flip the pronoun/answer order, so
+        # first just strip it out
+        question = question.replace(pronoun_or_name, '', 1)
+
         if yes:
             question = question.lower().replace(
                 'should', f'{pronoun_or_name} **should**', 1) 
