@@ -15,6 +15,7 @@ def answer_flip_question(call, result, question):
     question -- Question text to respond to.
     """
     question = ' '.join(question)
+
     yes = call == result
 
     yes_variations = [

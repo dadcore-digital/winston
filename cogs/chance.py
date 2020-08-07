@@ -80,10 +80,11 @@ class Chance(commands.Cog):
             await context.send(total_msg)
 
     @commands.command()
-    async def flip(self, context, *args):
+    async def flip(self, context, *, arg):
         """
         Flip a coin. Two choices: !flip heads OR !flip snails. 
         """
+        
         sides = ['heads', 'snails']
 
         invalid_side_errors = [
@@ -96,10 +97,10 @@ class Chance(commands.Cog):
 
         result = choice(sides)
         call = ''
-
+        params = arg.split(' ')
         # Weed out naughty flips
-        if args:
-            call = args[0]
+        if params:
+            call = params[0]
             if call not in sides:
                 if call == 'tails':
                     await context.send(f'This is terribly awkward, but I think you meant to say *snails*, perhaps?')
@@ -111,8 +112,8 @@ class Chance(commands.Cog):
         msg = ''
         
         # Check for question argument 
-        if len(args) > 1:
-            msg = answer_flip_question(call, result, args[1:])
+        if len(params) > 1:
+            msg = answer_flip_question(call, result, params[1:])
 
         elif call:
             if call == result:
