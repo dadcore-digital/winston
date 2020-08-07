@@ -43,86 +43,75 @@ def answer_flip_question(call, result, question):
         'east', 'west', 'central', 'japan', 'australia', 'oceania', 'europe'
     ]
 
-    starts_with_words = ['you', 'i', 'we', 'play on', 'is', 'are', 'it', 'we']
-
-    # Fix pronouns
-    question = re.sub(r'^i ', 'you ', question, flags=re.IGNORECASE)
-    question = re.sub(r'^we ', 'you ', question, flags=re.IGNORECASE)
+    # Replace existing punctuation with period.
+    question = question.rstrip('?').rstrip('!').rstrip('.')
+    question = f'{question}.'
 
     # If requesting to play on server like !flip heads west, make answer verbose
     if question.startswith(tuple(servers)):
         question = f'play on {question}'
 
-
-    # Add punctuation
-    question = question.rstrip('?').rstrip('!').rstrip('.')
-    question = f'{question}.'
+    phrases = [
+        {
+            'stem': 'should i',
+            'positive': 'you **should**',
+            'negative': 'you **shouldn\'t**'
+        },  
+        {
+            'stem': 'should we',
+            'positive': 'you **should*',
+            'negative': 'you **shouldn\'t**'
+        },
+        {
+            'stem': 'is it',
+            'positive': 'it **is**',
+            'negative': 'it **isn\'t**',            
+        },
+        {
+            'stem': 'are we',
+            'positive': 'you **are**',
+            'negative': 'you **aren\'t**'
+        },
+        {
+            'stem': 'play on',
+            'positive': 'you **should** play on',
+            'negative': 'you **shouldn\'t* play on'
+        }        
+    ]
     
+    # First try set phrases.
+    for phrase in phrases:
+        if question.lower().startswith(phrase['stem']):
+            if yes:
+                question = question.lower().replace(
+                    phrase['stem'], phrase['positive'], 1)
+                return f'{choice(yes_variations)}, {question}'
+
+            else:
+                question = question.lower().replace(
+                    phrase['stem'], phrase['negative'], 1)
+                return f'{choice(no_variations)}, {question}'                    
+
+    # Cover case of should + other personal pronouns and proper names
+    if question.lower().startswith('should'):
+        pronoun_or_name = question.split(' ')[1]
+
+        if yes:
+            question = question.lower().replace(
+                'should', f'{pronoun_or_name} **should**', 1) 
+            return f'{choice(yes_variations)}, {question}'
+
+        else:
+            question = question.lower().replace(
+                'should', f'{pronoun_or_name} **shouldn\'t**', 1) 
+            return f'{choice(no_variations)}, {question}'
+
+    # When all else fails, try this:
     if yes:
-        if question.lower().startswith(
-            ('should i', 'should i', 'should we')
-        ):
-            question = question.replace('should i', 'you **should**')
-            question = question.replace('should I', 'you **should**')
-            question = question.replace('should we', 'you **should**')
-        elif question.lower().startswith('is'):
-            question = question.lower().replace('is it', 'it **is** ', 1)
-        elif question.lower().startswith('are we'):
-            question = question.lower().replace('are we', 'you **are** ', 1)
-        elif question.lower().startswith('should'):
-            proper_noun = question.split(' ')[1]
-            question = question.replace(proper_noun, '')
-            question = question.replace('should', f'{proper_noun} **should**')
-
-        try:
-            needs_prepend = (
-                not question.lower().startswith(tuple(starts_with_words)) and
-                not question.split(' ')[1] == '**should**'
-            ) 
-        except IndexError:
-            needs_prepend = True
-
-        if needs_prepend:
-            question = f'you **should** {question}'
-        
-        if question.startswith('play on'):
-            question =f'you **should** {question}'
-        
-        return f'{choice(yes_variations)}, {question}'
-    
+        return f'{choice(yes_variations)}, you **should** {question.lower()}'
     else:
-        if question.lower().startswith(
-            ('should i', 'should i', 'should we')
-        ):
-            question = question.replace('should i', 'you **shouldn\'t**')
-            question = question.replace('should I', 'you **shouldn\'t**')
-            question = question.replace('should we', 'you **shouldn\'t**')
-        elif question.lower().startswith('is'):
-            question = question.lower().replace('is it', 'it **isn\'t** ', 1)
-        elif question.lower().startswith('are we'):
-            question = question.lower().replace('are we', 'you **aren\'t** ', 1)
-        elif question.lower().startswith('should'):
-            proper_noun = question.split(' ')[1]
-            question = question.replace(proper_noun, '')
-            question = question.replace('should', f'{proper_noun} **shouldn\'t**')
-
-        try:
-            needs_prepend = (
-                not question.startswith(tuple(starts_with_words)) and
-                not question.split(' ')[1] == '**shouldn\'t**'
-            ) 
-        except IndexError:
-            needs_prepend = True
-
-        if needs_prepend:
-            question = f'you **shouldn\'t** {question}'
-        
-        if question.startswith('play on'):
-            question =f'you **shouldn\'t** {question}'
-        
-        return f'{choice(no_variations)}, {question}'
-
-        return question
+        return f'{choice(no_variations)}, you **shouldn\'t** {question.lower()}'
+    
 
 def build_dice_roll_image(
     rolls, total_width=1120, row_height=160, dice_per_row=6):
