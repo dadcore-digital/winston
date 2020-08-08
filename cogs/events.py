@@ -7,7 +7,7 @@ from services.events import get_matches_timeline, get_match_embed_dict
 
 class Events(commands.Cog):
     def __init__(self, bot):
-        self.announce.start()
+        # self.announce.start()
         self.bot = bot
         
         settings = get_secret(['COGS', 'EVENTS'])

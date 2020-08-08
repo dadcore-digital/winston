@@ -4,7 +4,7 @@ from .secrets import get_secret
 from ics import Calendar
 from discord import Embed
 
-def get_matches_timeline(start=0, end=1440):
+def get_matches_timeline(start=0, end=1500):
     """
     Return a timeline of matches.
 
@@ -13,8 +13,8 @@ def get_matches_timeline(start=0, end=1440):
 
     Keyword arguments:
     start -- Beginning of timeline in minutes, relative to now. 0 means now. (int)
-    end -- End of timeline in minutes, relative to start. Default is 1440
-           (24 hours). (int)
+    end -- End of timeline in minutes, relative to start. Default is 1500
+           (24 + 1 hour for event length). (int)
     """
     calendar_url = get_secret('MATCH_CALENDAR_ICS')
     ics_data = requests.get(calendar_url).text
