@@ -9,9 +9,20 @@ from discord import Embed
 from discord.ext import commands
 from services.chance import (
     build_dice_roll_image, get_coin_flip_image, answer_flip_question)
+from services.settings import get_settings
 
 class Chance(commands.Cog):
 
+    def __init__(self, bot):
+        settings = get_settings(['COGS', 'CHANCE'])
+        self.SIDES = settings['SIDES']
+        self.INVALID_DICE_MESSAGES = settings['INVALID_DICE_MESSAGES']
+        self.EXCESSIVE_ROLL_MESSAGES = settings['EXCESSIVE_ROLL_MESSAGES']
+        self.INVALID_SIDE_ERRORS = settings['INVALID_SIDE_ERRORS']
+        self.VALID_DICE_TYPES = settings['VALID_DICE_TYPES']
+        self.FLIP_WIN = settings['FLIP_WIN']
+        self.FLIP_LOSE = settings['FLIP_LOSE']
+    
     @commands.command()
     async def roll(self, context, *args):
         """
@@ -22,24 +33,7 @@ class Chance(commands.Cog):
         total = 0
         rolls = []
         
-        invalid_dice_messages = [
-            "Terribly sorry, adventure to all the fantastic worlds you want, but your dice types must be of a non-fantasy nature.",
-            "Invented dice are strictly frowned upon.",
-            "Dice of the imagination are best left in that realm.",
-            "Do not trifle with the dice god! Your dice are invalid. Good day!",
-            "What non-euclidean are you trying to get me to roll? I am not a cthulhu.",
-            "Nah, hard pass."
-        ]
-        
         valid_dice_types = [4, 6, 8, 10, 12, 20, 100, 1000]
-
-        excessive_roll_messages = [
-            "Pardon me, but if I may say, that is an excessive amount of dice rolls.",
-            "I cannot permit a fireball of that magnitude.",
-            "Your meta-gaming is getting out of hand, I cannot in good conscience execute this roll.",
-            "I love your moxy, but no. Just no.",
-            "NERP!",
-        ]
 
         for arg in args:
             try:
@@ -47,7 +41,7 @@ class Chance(commands.Cog):
                 dice_type = int(dice_type)
             
                 if dice_type not in valid_dice_types:
-                    await context.send(choice(invalid_dice_messages))
+                    await context.send(choice(self.INVALID_DICE_MESSAGES))
                     return None
 
                 dice_quantity = int(dice_quantity)
@@ -64,7 +58,7 @@ class Chance(commands.Cog):
 
         # Let's be reasonable.        
         if len(rolls) > 100:
-            await context.send(choice(excessive_roll_messages))
+            await context.send(choice(self.EXCESSIVE_ROLL_MESSAGES))
             return None
 
         # Avoid writing image to disk
@@ -84,29 +78,15 @@ class Chance(commands.Cog):
         """
         Flip a coin. Two choices: !flip heads OR !flip snails. 
         """
-        sides = ['heads', 'snails']
-
-        invalid_side_errors = [
-            'I do not recognize the legitmacy of that call.',
-            'Call a side. No, not that one.',
-            'I love you, but you are making a mockery of the process!',
-            'Respect the game, dawg.',
-            'Oh so we can just MAKE UP sides now huh? DENIED.'
-        ]
-
-        result = choice(sides)
+        result = choice(self.SIDES)
         call = ''
         params = arg.split(' ')
         # Weed out naughty flips
         if params:
             call = params[0]
-            if call not in sides:
-                if call == 'tails':
-                    await context.send(f'This is terribly awkward, but I think you meant to say *snails*, perhaps?')
-                    return None
-                else:
-                    await context.send(choice(invalid_side_errors))
-                    return None
+            if call not in self.SIDES:
+                await context.send(choice(self.INVALID_SIDE_ERRORS))
+                return None
 
         msg = ''
         
@@ -116,9 +96,9 @@ class Chance(commands.Cog):
 
         elif call:
             if call == result:
-                msg = f"Very good, it is indeed **{result}**."
+                msg = f"{self.FLIP_WIN} **{result}**."
             else:
-                msg = f"Dreadfully sorry, but that's **{result}**."
+                msg = f"{self.FLIP_LOSE} **{result}**."
 
         image = get_coin_flip_image(result)
         await context.send(file=discord.File(image, 'flip.gif'))
