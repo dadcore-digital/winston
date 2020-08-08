@@ -1,14 +1,11 @@
 #! /home/ianfitzpatrick/apps/winston_bot/env/bin/python
-
+import importlib
 from discord.ext import commands
-from cogs.events import Events
-from cogs.wiki import Wiki
-from cogs.chance import Chance
 from cogs.autoresponder import AutoResponder
 from services.settings import get_settings
 
 BOT_TOKEN = get_settings('BOT_TOKEN')
-
+LOAD_COGS = get_settings('LOAD_COGS')
 
 async def get_pre(bot, message):
     prefixes = ['!']
@@ -20,9 +17,11 @@ async def get_pre(bot, message):
 
 bot = commands.Bot(command_prefix=get_pre)
 
-bot.add_cog(Events(bot))
-bot.add_cog(Wiki(bot))
-bot.add_cog(AutoResponder(bot))
-bot.add_cog(Chance(bot))
+for cog in LOAD_COGS:
+    class_name = cog
+    module_name = f'cogs.{cog.lower()}'
+    module = importlib.import_module(module_name)
+    class_ = getattr(module, class_name)
+    bot.add_cog(class_(bot))
 
 bot.run(BOT_TOKEN)

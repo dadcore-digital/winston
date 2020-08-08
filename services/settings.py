@@ -21,7 +21,7 @@ def get_settings(settings_name):
     try:
         # A root level setting was requested, passed as a string
         if isinstance(settings_name, str):
-            return str(settings_file[settings_name])
+            return settings_file[settings_name]
         
         # A list of keys was passed, traverse through dictionary
         # and return last key in dict structure.
