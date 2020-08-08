@@ -5,9 +5,9 @@ from cogs.events import Events
 from cogs.wiki import Wiki
 from cogs.chance import Chance
 from cogs.autoresponder import AutoResponder
-from services.secrets import get_secret
+from services.settings import get_settings
 
-BOT_TOKEN = get_secret('BOT_TOKEN')
+BOT_TOKEN = get_settings('BOT_TOKEN')
 
 
 async def get_pre(bot, message):

@@ -2,15 +2,15 @@ from random import choice
 import arrow
 import requests
 from discord.ext import commands, tasks
-from services.secrets import get_secret
+from services.settings import get_settings
 from services.events import get_matches_timeline, get_match_embed_dict
 
 class Events(commands.Cog):
     def __init__(self, bot):
-        # self.announce.start()
+        self.announce.start()
         self.bot = bot
         
-        settings = get_secret(['COGS', 'EVENTS'])
+        settings = get_settings(['COGS', 'EVENTS'])
 
         self.MINS_BEFORE = settings['ANNOUNCE_MATCH_MINS_BEFORE']
         self.CHANNEL_ID = settings['ANNOUNCE_MATCH_CHANNEL_ID']

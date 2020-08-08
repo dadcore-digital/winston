@@ -11,6 +11,7 @@ __pycache__/
 .cache/
 debug.png
 secrets.json
+settings.json
 data/
 env/
 .vscode/
