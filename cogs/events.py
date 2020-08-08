@@ -1,11 +1,24 @@
+from random import choice
+import arrow
 import requests
-from discord.ext import commands
+from discord.ext import commands, tasks
 from services.secrets import get_secret
 from services.events import get_matches_timeline, get_match_embed_dict
 
 class Events(commands.Cog):
     def __init__(self, bot):
-        pass
+        self.announce.start()
+        self.bot = bot
+        
+        settings = get_secret(['COGS', 'EVENTS'])
+
+        self.MINS_BEFORE = settings['ANNOUNCE_MATCH_MINS_BEFORE']
+        self.CHANNEL_ID = settings['ANNOUNCE_MATCH_CHANNEL_ID']
+        self.APOLOGY = settings['ANNOUNCE_APOLOGY']
+        self.HYPE = settings['ANNOUNCE_HYPE']
+    
+    def cog_unload(self):
+        self.announce.cancel()
 
     @commands.command()
     async def matches(self, context, *args):
@@ -37,10 +50,39 @@ class Events(commands.Cog):
             else:
                 msg = '__Here are the next upcoming matches (double-booked):__'
             
-            
         
         await context.send(msg)
 
         for match in matches:
             await context.send(embed=match['embed'])
+    
+    @tasks.loop(seconds=60.0)
+    async def announce(self):
+        now = arrow.now()
+        channel = self.bot.get_channel(self.CHANNEL_ID) 
+
+        timeline = get_matches_timeline(end=60)
+
+        matches = []
+        for entry in timeline:
+            minutes_until = (entry.begin - arrow.now()).seconds / 60 
+            print(minutes_until)
+            if (
+                minutes_until > float(self.MINS_BEFORE)
+                and minutes_until < float(self.MINS_BEFORE) + 1
+            ):
+                matches.append(get_match_embed_dict(entry))
+
+        if len(matches):
+            plural = 'es' if len(matches) > 1 else ''  
+            flavor = f'{choice(self.APOLOGY)}, {choice(self.HYPE)}!' 
+            msg = f'{flavor}\n:loudspeaker:  __Match{plural} happening in {self.MINS_BEFORE} Minutes!__'
+            await channel.send(msg)
+
+            for match in matches:
+                await channel.send(embed=match['embed'])
+
+    @announce.before_loop
+    async def before_announce(self):
+        await self.bot.wait_until_ready()
 

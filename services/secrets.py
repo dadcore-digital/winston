@@ -19,7 +19,25 @@ def get_secret(secret_name):
     with open(secrets_file) as f:
         secrets_file = json.loads(f.read())
     try:
-        return str(secrets_file[secret_name])
+        # A root level setting was requested, passed as a string
+        if isinstance(secret_name, str):
+            return str(secrets_file[secret_name])
+        
+        # A list of keys was passed, traverse through dictionary
+        # and return last key in dict structure.
+        elif isinstance(secret_name, list):            
+            secret_dict = {}
+            for idx in range(len(secret_name)):
+                if idx == 0:
+                    secret_dict[secret_name[idx]] = {}
+                else:
+                    secret_dict[secret_name[idx - 1]] = secrets_file[secret_name[idx-1]]
+
+                    # On last iteration, return final key value, minus key name
+                    if idx == len(secret_name) - 1:
+                        return secrets_file[secret_name[idx-1]][secret_name[idx]]
+        else:
+            raise KeyError
 
     except KeyError:
         error_msg = 'Missing secrets file.'
