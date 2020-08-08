@@ -1,0 +1,69 @@
+{
+    "BOT_TOKEN": "YOURSECRETTOKENHERE",
+    "LOAD_COGS": ["Events", "Wiki", "AutoResponder", "Chance"],
+    "COGS": {
+        "EVENTS": {
+            "ANNOUNCE_MATCH_MINS_BEFORE": 5,
+            "ANNOUNCE_MATCH_CHANNEL_ID": 1234567890,
+            "ANNOUNCE_APOLOGY": [
+                "Dreadfully sorry but",
+                "Apologies for the intrusion, however",
+                "If it's not incovenient, I'd like to inform you that",
+                "According to my records",
+                "I've consulted my notes and",
+                "I hate to be a bother but",
+                "According to my files",
+                "Just popping in to say"
+            ],
+            "ANNOUNCE_HYPE": [
+                "AWW SNAP, it's on",
+                "LETS GO LETS GO LETS GO",
+                "IT'S GO TIME PEOPLE",
+                "you need to get pumped right now",
+                "AWOOOOGA, AWOOOGA",
+                "yo dawg it's that time again",
+                "the Hype Machine is about to power up",
+                "I believe it's about get 'real all up in this piece'"
+            ],
+            "MATCH_CALENDAR_ICS": "https://kqbdiscord.com/matches.ics"
+        },
+        "CHANCE": {
+            "SIDES": ["heads", "snails"],
+            "INVALID_DICE_MESSAGES": [
+                "Terribly sorry, adventure to all the fantastic worlds you want, but your dice types must be of a non-fantasy nature.",
+                "Invented dice are strictly frowned upon.",
+                "Dice of the imagination are best left in that realm.",
+                "Do not trifle with the dice god! Your dice are invalid. Good day!",
+                "What non-euclidean are you trying to get me to roll? I am not a cthulhu.",
+                "Nah, hard pass."
+            ],
+            "EXCESSIVE_ROLL_MESSAGES": [
+                "Terribly sorry, adventure to all the fantastic worlds you want, but your dice types must be of a non-fantasy nature.",
+                "Invented dice are strictly frowned upon.",
+                "Dice of the imagination are best left in that realm.",
+                "Do not trifle with the dice god! Your dice are invalid. Good day!",
+                "What non-euclidean are you trying to get me to roll? I am not a cthulhu.",
+                "Nah, hard pass."
+            ],
+            "INVALID_SIDE_ERRORS": [
+                "I do not recognize the legitmacy of that call.",
+                "Call a side. No, not that one.",
+                "I love you, but you are making a mockery of the process!",
+                "Respect the game, dawg.",
+                "Oh so we can just MAKE UP sides now huh? DENIED."
+            ],
+            "VALID_DICE_TYPES": [
+                4,
+                6,
+                8,
+                10,
+                12,
+                20,
+                100,
+                1000
+            ],
+            "FLIP_WIN": "Very good, it is indeed",
+            "FLIP_LOSE": "Dreadfully sorry, but that's"
+        }
+    }
+}
