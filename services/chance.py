@@ -2,6 +2,7 @@ import re
 import sys
 from random import choice
 from PIL import Image
+from services.settings import get_settings
 
 def answer_flip_question(call, result, question):
     """
@@ -16,81 +17,40 @@ def answer_flip_question(call, result, question):
     """
     question = ' '.join(question)
 
+    settings = get_settings(['COGS', 'CHANCE'])['FLIP']
+    YES_VARIATIONS = settings['YES_VARIATIONS']
+    NO_VARIATIONS = settings['NO_VARIATIONS']
+    SERVERS = settings['SERVERS']
+    COLORS = settings['COLORS']
+    SET_PHRASES = settings['SET_PHRASES']
+    
+    # Did we win or lose the fip?
     yes = call == result
 
-    yes_variations = [
-        'YERP',
-        'Obviously yes',
-        'It\'s clear to everyone here that YEP',
-        'Yes yes yes',
-        'Indubitably, yes',
-        'Fo sho yeah',
-        'You knew it all along, but yes',
-        "Awwwwwwwwww yeaaaaaaah"
-    ]
+    # If requesting to play on server like !flip heads west, make answer verbose
+    if question.startswith(tuple(SERVERS)):
+        question = f'play on {question}'
 
-    no_variations = [
-        'NERP',
-        'Negatory',
-        'No no no no no no no no',
-        'Noooooooooooooooooo',
-        'Quite no I\'m afraid',
-        'Nope',
-        'You knew the answer in your heart was **no**, and you were right',
-    ]
-
-    servers = [
-        'east', 'west', 'central', 'japan', 'australia', 'oceania', 'europe'
-    ]
+    # If requesting to play as color !flip heads blue, make answer verbose
+    if question.startswith(tuple(COLORS)):
+        question = f'be {question} team'
 
     # Replace existing punctuation with period.
     question = question.rstrip('?').rstrip('!').rstrip('.')
     question = f'{question}.'
 
-    # If requesting to play on server like !flip heads west, make answer verbose
-    if question.startswith(tuple(servers)):
-        question = f'play on {question}'
-
-    phrases = [
-        {
-            'stem': 'should i',
-            'positive': 'you **should**',
-            'negative': 'you **shouldn\'t**'
-        },  
-        {
-            'stem': 'should we',
-            'positive': 'you **should**',
-            'negative': 'you **shouldn\'t**'
-        },
-        {
-            'stem': 'is it',
-            'positive': 'it **is**',
-            'negative': 'it **isn\'t**',            
-        },
-        {
-            'stem': 'are we',
-            'positive': 'you **are**',
-            'negative': 'you **aren\'t**'
-        },
-        {
-            'stem': 'play on',
-            'positive': 'you **should** play on',
-            'negative': 'you **shouldn\'t** play on'
-        }        
-    ]
-    
     # First try set phrases.
-    for phrase in phrases:
+    for phrase in SET_PHRASES:
         if question.lower().startswith(phrase['stem']):
             if yes:
                 question = question.lower().replace(
                     phrase['stem'], phrase['positive'], 1)
-                return f'{choice(yes_variations)}, {question}'
+                return f'{choice(YES_VARIATIONS)}, {question}'
 
             else:
                 question = question.lower().replace(
                     phrase['stem'], phrase['negative'], 1)
-                return f'{choice(no_variations)}, {question}'                    
+                return f'{choice(NO_VARIATIONS)}, {question}'                    
 
     # Cover case of should + other personal pronouns and proper names
     if question.lower().startswith('should'):
@@ -103,18 +63,18 @@ def answer_flip_question(call, result, question):
         if yes:
             question = question.lower().replace(
                 'should', f'{pronoun_or_name} **should**', 1) 
-            return f'{choice(yes_variations)}, {question}'
+            return f'{choice(YES_VARIATIONS)}, {question}'
 
         else:
             question = question.lower().replace(
                 'should', f'{pronoun_or_name} **shouldn\'t**', 1) 
-            return f'{choice(no_variations)}, {question}'
+            return f'{choice(NO_VARIATIONS)}, {question}'
 
     # When all else fails, try this:
     if yes:
-        return f'{choice(yes_variations)}, you **should** {question.lower()}'
+        return f'{choice(YES_VARIATIONS)}, you **should** {question.lower()}'
     else:
-        return f'{choice(no_variations)}, you **shouldn\'t** {question.lower()}'
+        return f'{choice(NO_VARIATIONS)}, you **shouldn\'t** {question.lower()}'
     
 
 def build_dice_roll_image(

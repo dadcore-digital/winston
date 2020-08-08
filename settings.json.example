@@ -28,7 +28,6 @@
             "MATCH_CALENDAR_ICS": "https://kqbdiscord.com/matches.ics"
         },
         "CHANCE": {
-            "SIDES": ["heads", "snails"],
             "INVALID_DICE_MESSAGES": [
                 "Terribly sorry, adventure to all the fantastic worlds you want, but your dice types must be of a non-fantasy nature.",
                 "Invented dice are strictly frowned upon.",
@@ -62,8 +61,73 @@
                 100,
                 1000
             ],
-            "FLIP_WIN": "Very good, it is indeed",
-            "FLIP_LOSE": "Dreadfully sorry, but that's"
+            "FLIP": {
+                "WIN_MESSAGE": "Very good, it is indeed",
+                "LOSE_MESSAGE": "Dreadfully sorry, but that's",
+                "SIDES": ["heads", "snails"],
+                "SET_PHRASES": [
+                    {
+                        "stem": "should i",
+                        "positive": "you **should**",
+                        "negative": "you **shouldn\"t**"
+                    },
+                    {
+                        "stem": "should we",
+                        "positive": "you **should**",
+                        "negative": "you **shouldn\"t**"
+                    },
+                    {
+                        "stem": "is it",
+                        "positive": "it **is**",
+                        "negative": "it **isn\"t**"
+                    },
+                    {
+                        "stem": "are we",
+                        "positive": "you **are**",
+                        "negative": "you **aren\"t**"
+                    },
+                    {
+                        "stem": "play on",
+                        "positive": "you **should** play on",
+                        "negative": "you **shouldn\"t** play on"
+                    }
+                ],
+                "YES_VARIATIONS": [
+                    "YERP",
+                    "Obviously yes",
+                    "It's clear to everyone here that YEP",
+                    "Yes yes yes",
+                    "Indubitably, yes",
+                    "Fo sho yeah",
+                    "You knew it all along, but yes",
+                    "Awwwwwwwwww yeaaaaaaah"
+                ],
+                "NO_VARIATIONS": [
+                    "NERP",
+                    "Negatory",
+                    "No no no no no no no no",
+                    "Noooooooooooooooooo",
+                    "Quite no I'm afraid",
+                    "Nope",
+                    "You knew the answer in your heart was **no**, and you were right"
+                ],
+                "SERVERS": [
+                    "east",
+                    "west",
+                    "central",
+                    "japan",
+                    "australia",
+                    "oceania",
+                    "europe"
+                ],
+                "COLORS": [
+                    "blue",
+                    "gold",
+                    "yellow",
+                    "left",
+                    "right"
+                ]
+            }
         }
     }
 }

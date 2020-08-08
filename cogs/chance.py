@@ -15,13 +15,17 @@ class Chance(commands.Cog):
 
     def __init__(self, bot):
         settings = get_settings(['COGS', 'CHANCE'])
-        self.SIDES = settings['SIDES']
+
+        # Dice/Roll Settings
         self.INVALID_DICE_MESSAGES = settings['INVALID_DICE_MESSAGES']
         self.EXCESSIVE_ROLL_MESSAGES = settings['EXCESSIVE_ROLL_MESSAGES']
         self.INVALID_SIDE_ERRORS = settings['INVALID_SIDE_ERRORS']
         self.VALID_DICE_TYPES = settings['VALID_DICE_TYPES']
-        self.FLIP_WIN = settings['FLIP_WIN']
-        self.FLIP_LOSE = settings['FLIP_LOSE']
+
+        # Coin Filp Settings
+        self.SIDES = settings['FLIP']['SIDES']
+        self.FLIP_WIN = settings['FLIP']['WIN_MESSAGE']
+        self.FLIP_LOSE = settings['FLIP']['LOSE_MESSAGE']
     
     @commands.command()
     async def roll(self, context, *args):
@@ -45,8 +49,6 @@ class Chance(commands.Cog):
                     return None
 
                 dice_quantity = int(dice_quantity)
-
-
 
             except ValueError:
                 dice_quantity = 1
