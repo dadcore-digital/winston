@@ -16,7 +16,8 @@ def get_matches_timeline(start=0, end=1500):
     end -- End of timeline in minutes, relative to start. Default is 1500
            (24 + 1 hour for event length). (int)
     """
-    calendar_url = get_settings('MATCH_CALENDAR_ICS')
+    settings = get_settings(['COGS', 'EVENTS'])
+    calendar_url = settings['MATCH_CALENDAR_ICS']
     ics_data = requests.get(calendar_url).text
     cal = Calendar(imports=ics_data)
     start = arrow.utcnow().shift(minutes=start)
@@ -49,7 +50,6 @@ def get_match_embed_dict(entry):
 
         # Handle inconsistent line breaks and split into list
         description = entry.description.replace('<br>', '\n')
-        # description = entry.description.split('\n')
 
         embed.add_field(name='Details', value=description, inline=False)
 
