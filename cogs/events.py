@@ -60,16 +60,15 @@ class Events(commands.Cog):
     async def announce(self):
         now = arrow.now()
         channel = self.bot.get_channel(self.CHANNEL_ID) 
-
-        timeline = get_matches_timeline(end=60)
-
+    
+        timeline = get_matches_timeline(end=240)
+        
         matches = []
         for entry in timeline:
             minutes_until = (entry.begin - arrow.now()).seconds / 60 
-            print(minutes_until)
             if (
-                minutes_until > float(self.MINS_BEFORE)
-                and minutes_until < float(self.MINS_BEFORE) + 1
+                minutes_until >= float(self.MINS_BEFORE)
+                and minutes_until <= float(self.MINS_BEFORE) + 1
             ):
                 matches.append(get_match_embed_dict(entry))
 
