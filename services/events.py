@@ -1,3 +1,4 @@
+import re
 import arrow
 import requests
 from .settings import get_settings
@@ -42,7 +43,15 @@ def get_match_embed_dict(entry):
     time_until = entry.begin.humanize(granularity=['hour', 'minute'])
     stream = 'TBD'
 
-    embed = Embed(title=title, color=0x874efe)
+    link = ''
+    try:
+        res = re.search('(https://twitch.tv/.*)\n', entry.description) 
+        if res:
+            link = res.groups()[0]  
+    except:
+        pass
+
+    embed = Embed(title=title, color=0x874efe, url=link)
     embed.add_field(name='Time', value=f'{begin_time} ET')
     embed.add_field(name='Countdown', value=time_until)
 
