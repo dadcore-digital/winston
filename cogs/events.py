@@ -1,3 +1,4 @@
+from datetime import datetime
 from random import choice
 import arrow
 import requests
@@ -58,28 +59,37 @@ class Events(commands.Cog):
     
     @tasks.loop(seconds=60.0)
     async def announce(self):
-        now = arrow.now()
-        channel = self.bot.get_channel(self.CHANNEL_ID) 
-    
-        timeline = get_matches_timeline(end=240)
+        try:
+            print(f'[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Checking for upcoming matches...')
+
+            raise ValueError('BLah')
+            now = arrow.now()
+            channel = self.bot.get_channel(self.CHANNEL_ID) 
         
-        matches = []
-        for entry in timeline:
-            minutes_until = (entry.begin - arrow.now()).seconds / 60 
-            if (
-                minutes_until >= float(self.MINS_BEFORE)
-                and minutes_until <= float(self.MINS_BEFORE) + 1
-            ):
-                matches.append(get_match_embed_dict(entry))
+            timeline = get_matches_timeline(end=240)
+            matches = []
+            for entry in timeline:
+                minutes_until = (entry.begin - arrow.now()).seconds / 60 
+                if (
+                    minutes_until >= float(self.MINS_BEFORE)
+                    and minutes_until <= float(self.MINS_BEFORE) + 1
+                ):
+                    matches.append(get_match_embed_dict(entry))
 
-        if len(matches):
-            plural = 'es' if len(matches) > 1 else ''  
-            flavor = f'{choice(self.APOLOGY)}, {choice(self.HYPE)}!' 
-            msg = f'{flavor}\n:loudspeaker:  __Match{plural} happening in {self.MINS_BEFORE} Minutes!__'
-            await channel.send(msg)
+            if len(matches):
+                print(f'[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] {len(matches)} found.')
+                plural = 'es' if len(matches) > 1 else ''  
+                flavor = f'{choice(self.APOLOGY)}, {choice(self.HYPE)}!' 
+                msg = f'{flavor}\n:loudspeaker:  __Match{plural} happening in {self.MINS_BEFORE} Minutes!__'
+                await channel.send(msg)
 
-            for match in matches:
-                await channel.send(embed=match['embed'])
+                for match in matches:
+                    await channel.send(embed=match['embed'])
+            else:
+                print(f'[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] No Upcoming Matches')
+
+        except Exception as error:
+            print(f'[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] ERROR: {error}')
 
     @announce.before_loop
     async def before_announce(self):
