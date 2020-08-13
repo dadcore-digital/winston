@@ -21,7 +21,7 @@ def get_matches_timeline(start=0, end=1500):
     calendar_url = settings['MATCH_CALENDAR_ICS']
     ics_data = requests.get(calendar_url).text
     cal = Calendar(imports=ics_data)
-    start = arrow.utcnow().shift(minutes=start)
+    start = arrow.utcnow().shift(minutes=start).floor('minutes')
     end = start.shift(minutes=end)
     timeline = cal.timeline.included(start, end)
     

@@ -1,11 +1,22 @@
 #! /home/ianfitzpatrick/apps/winston_bot/env/bin/python
 import importlib
+import logging
 from discord.ext import commands
 from cogs.autoresponder import AutoResponder
 from services.settings import get_settings
 
 BOT_TOKEN = get_settings('BOT_TOKEN')
 LOAD_COGS = get_settings('LOAD_COGS')
+LOG_FILE = get_settings('LOG_FILE')
+
+# Logging Settings
+logging.basicConfig(
+    level=logging.INFO,
+    format='[%(asctime)s] %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+    filename=LOG_FILE,
+    filemode='a'
+)
 
 async def get_pre(bot, message):
     prefixes = ['!']
