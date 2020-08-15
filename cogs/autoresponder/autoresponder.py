@@ -2,7 +2,9 @@ import random
 import requests
 from pyquery import PyQuery as pq
 from discord.ext import commands
-
+from tortoise.exceptions import DoesNotExist
+from .models import Response
+from services import db
 
 class AutoResponder(commands.Cog):
     def __init__(self, bot):
@@ -14,27 +16,41 @@ class AutoResponder(commands.Cog):
         """
         Automatic replies supplied by you at: https://killerqueenblack.wiki/community/discord/winston/
         """
-        query = ' '.join(args)
+        await db.open()
 
-        resp = requests.get(self.RESPONSES_URL)
-        doc = pq(resp.content)
-        article = doc('.wiki-article')
-        msg = f'Shortcut to autoresponder is missing? Double check: <{self.RESPONSES_URL}>'
+        if args[0] == 'add':
+            shortcut = args[1]
+            text = args[2]
+            response = Response(shortcut=shortcut, text=text)
+            await response.save()
+            await context.send(f'Added response `!{shortcut} {text}`')
 
-        shortcuts = article(':header')
+        elif args[0] == 'list':
+            responses = await Response.all()
+            msg = '__Here all autoresponders__'
+            for response in responses:
+                msg += f'\n`{response.shortcut}`:       {response.text}'
 
-        # Match all headers and extract following paragraph or link text value
-        # as responder.
-        for shortcut in shortcuts:
-            if query.lower() in shortcut.text.lower():
-                response_text = shortcut.getnext().text
+            await context.send(msg)
 
-                # Do acrobatics in order to extract anchor href value
-                if not response_text:
-                    child_anchors = shortcut.getnext().getchildren()
-                    if child_anchors:
-                        response_text = child_anchors[0].attrib['href']
+        elif args[0] == 'remove' or args[0] == 'del':
+            shortcut = args[1]
+            try:
+                response = await Response.get(shortcut=shortcut)
+                await response.delete()                
+                await context.send(f'`{shortcut}` **deleted.**')
+            
+            except DoesNotExist:
+                pass
 
-                msg = response_text
 
-        await context.send(msg)
+        else:
+            try:
+                response = await Response.get(shortcut=args[0])
+                await context.send(response.text)
+            
+            except DoesNotExist:
+                pass
+
+        await db.close()
+        
