@@ -2,6 +2,7 @@ import random
 import requests
 from pyquery import PyQuery as pq
 from discord.ext import commands
+from tabulate import tabulate
 from tortoise.exceptions import DoesNotExist
 from services import db
 from services.settings import get_settings
@@ -73,9 +74,18 @@ class AutoResponder(commands.Cog):
         await db.open()
         responses = await Response.all()
         msg = '__Here all autoresponders__'
+        headers = ['Shortcut', 'Response']
+        table = []
         for response in responses:
-            msg += f'\n`{response.shortcut}`:       {response.text}'
+            text = response.text
+            text = text.replace ('\n', ' ')
 
+            if len(text) > 80:
+                text = text[:79] + '...'
+            table.append([response.shortcut, text]) 
+
+        table_data = tabulate(table, headers=headers, tablefmt='presto')
+        msg = f'__Here is a list of all auto-responders__:\n```\n{table_data}\n```'
         await context.send(msg)
         await db.close()
 
