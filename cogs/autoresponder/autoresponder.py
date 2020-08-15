@@ -20,7 +20,7 @@ class AutoResponder(commands.Cog):
     @commands.group(invoke_without_command=True)
     async def show(self, context, *args):
         """
-        Automatic replies supplied by you at: https://killerqueenblack.wiki/community/discord/winston/
+        Automatic replies, added by mods. !show list to see all.
         """
         await db.open()
         try:
