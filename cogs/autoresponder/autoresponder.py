@@ -54,7 +54,7 @@ class AutoResponder(commands.Cog):
         Delete an autoresponder: show delete popranked
         """
         await db.open()
-        shortcut = args[1]
+        shortcut = args[0]
 
         try:
             response = await Response.get(shortcut=shortcut)
