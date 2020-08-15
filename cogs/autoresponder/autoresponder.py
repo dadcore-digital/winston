@@ -80,8 +80,8 @@ class AutoResponder(commands.Cog):
             text = response.text
             text = text.replace ('\n', ' ')
 
-            if len(text) > 80:
-                text = text[:79] + '...'
+            if len(text) > 50:
+                text = text[:49] + '...'
             table.append([response.shortcut, text]) 
 
         table_data = tabulate(table, headers=headers, tablefmt='presto')
