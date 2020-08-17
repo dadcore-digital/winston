@@ -87,7 +87,8 @@ class Chance(commands.Cog):
         if params:
             call = params[0]
             if call not in self.SIDES:
-                await context.send(choice(self.INVALID_SIDE_ERRORS))
+                helpful_message = '\nTry `flip snails <question>` or `flip heads <question>` instead.'
+                await context.send(f'{choice(self.INVALID_SIDE_ERRORS)}{helpful_message}')
                 return None
 
         msg = ''

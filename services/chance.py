@@ -141,5 +141,5 @@ def get_coin_flip_image(side):
     side -- Side of coin to show. 'heads' or 'snails' (str)
     """
     if side not in ['heads', 'snails']:
-        raise ValueERror
+        raise ValueError
     return f'{sys.path[0]}/services/assets/{side}.gif'
