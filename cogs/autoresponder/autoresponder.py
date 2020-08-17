@@ -61,7 +61,7 @@ class AutoResponder(commands.Cog):
             responses = await Response.filter(shortcut=shortcut).order_by('id')
 
             if len(responses) == 1:
-                await responses.delete()
+                await responses[0].delete()
                 await context.send(f'`{shortcut}` **deleted.**')
             elif len(responses) > 1:
                 if len(args) == 1:
