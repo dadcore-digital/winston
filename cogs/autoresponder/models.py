@@ -8,4 +8,4 @@ class Response(Model):
 
     id = fields.IntField(pk=True)
     text = fields.CharField(max_length=1024)
-    shortcut = fields.CharField(max_length=64, unique=True)
+    shortcut = fields.CharField(max_length=64)

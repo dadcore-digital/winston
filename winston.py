@@ -25,7 +25,7 @@ async def get_pre(bot, message):
 
     return commands.when_mentioned_or(*prefixes)(bot, message)
 
-bot = commands.Bot(command_prefix=get_pre)
+bot = commands.Bot(command_prefix=get_pre, case_insensitive=True)
 
 for cog in LOAD_COGS:
     class_name = cog
