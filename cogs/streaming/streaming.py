@@ -109,7 +109,7 @@ class Streaming(commands.Cog):
                     })
 
                     msg = f'**{stream.user_name}** just went live!'
-                    await context.send(msg, embed=embed)
+                    await channel.send(msg, embed=embed)
 
             await db.close()
         
