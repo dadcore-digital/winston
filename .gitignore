@@ -15,3 +15,4 @@ settings.json
 data/
 env/
 .vscode/
+*.sqlite3
