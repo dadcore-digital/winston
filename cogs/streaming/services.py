@@ -1,5 +1,20 @@
 import requests
+from discord import Embed
 from services.settings import get_settings
+
+def get_stream_embed(stream_dict):
+
+    link = f'https://twitch.tv/{stream_dict["user_name"]}'
+    embed = Embed(
+        title=stream_dict['title'], color=0x009051, url=link)
+    embed.add_field(name='Streamer', value=stream_dict['user_name'], inline=True)
+    embed.add_field(name='Watching', value=stream_dict['viewer_count'], inline=True)
+    embed.add_field(name='Started At', value=stream_dict['started_at'], inline=False)
+    
+    thumbnail = stream_dict['thumbnail_url'].replace('{width}', '').replace('{height}', '')
+    embed.set_thumbnail(url=thumbnail)
+
+    return embed
 
 class Twitch:
     
@@ -57,7 +72,7 @@ class Twitch:
                 {
                     'id': '39323156014',
                     'user_id': '473987568',
-                    'user_name': 'another streamer',
+                    'user_name': 'another_streamer',
                     'game_id': '506455',
                     'type': 'live',
                     'title': 'testing',
@@ -66,120 +81,16 @@ class Twitch:
                     'language': 'en',
                     'thumbnail_url': 'https://static-cdn.jtvnw.net/previews-ttv/live_user_fonzworth_bentley-{width}x{height}.jpg',
                     'tag_ids': ['6ea6bca4-4712-4ab9-a906-e3336a9d8039']
-                },
+                },                
                 {
-                    'id': '3932319926014',
-                    'user_id': '4722387568',
-                    'user_name': 'yet another person',
-                    'game_id': '506455',
-                    'type': 'live',
-                    'title': 'testing',
-                    'viewer_count': 1,
-                    'started_at': '2020-08-18T03:11:34Z',
-                    'language': 'en',
-                    'thumbnail_url': 'https://static-cdn.jtvnw.net/previews-ttv/live_user_fonzworth_bentley-{width}x{height}.jpg',
-                    'tag_ids': ['6ea6bca4-4712-4ab9-a906-e3336a9d8039']
-                },
-                {
-                    'id': '5',
-                    'user_id': '4722387568',
-                    'user_name': 'yet another person',
-                    'game_id': '506455',
-                    'type': 'live',
-                    'title': 'testing',
-                    'viewer_count': 1,
-                    'started_at': '2020-08-18T03:11:34Z',
-                    'language': 'en',
-                    'thumbnail_url': 'https://static-cdn.jtvnw.net/previews-ttv/live_user_fonzworth_bentley-{width}x{height}.jpg',
-                    'tag_ids': ['6ea6bca4-4712-4ab9-a906-e3336a9d8039']
-                },
-                {
-                    'id': '6',
-                    'user_id': '4722387568',
-                    'user_name': 'yet another person',
-                    'game_id': '506455',
-                    'type': 'live',
-                    'title': 'testing',
-                    'viewer_count': 1,
-                    'started_at': '2020-08-18T05:45:34Z',
-                    'language': 'en',
-                    'thumbnail_url': 'https://static-cdn.jtvnw.net/previews-ttv/live_user_fonzworth_bentley-{width}x{height}.jpg',
-                    'tag_ids': ['6ea6bca4-4712-4ab9-a906-e3336a9d8039']
-                },
-                {
-                    'id': '7',
-                    'user_id': '4722387568',
-                    'user_name': 'yet another person',
-                    'game_id': '506455',
-                    'type': 'live',
-                    'title': 'testing',
-                    'viewer_count': 1,
-                    'started_at': '2020-08-18T05:45:34Z',
-                    'language': 'en',
-                    'thumbnail_url': 'https://static-cdn.jtvnw.net/previews-ttv/live_user_fonzworth_bentley-{width}x{height}.jpg',
-                    'tag_ids': ['6ea6bca4-4712-4ab9-a906-e3336a9d8039']
-                },
-                {
-                    'id': '8',
-                    'user_id': '4722387568',
-                    'user_name': 'yet another person',
-                    'game_id': '506455',
-                    'type': 'live',
-                    'title': 'testing',
-                    'viewer_count': 1,
-                    'started_at': '2020-08-18T05:45:34Z',
-                    'language': 'en',
-                    'thumbnail_url': 'https://static-cdn.jtvnw.net/previews-ttv/live_user_fonzworth_bentley-{width}x{height}.jpg',
-                    'tag_ids': ['6ea6bca4-4712-4ab9-a906-e3336a9d8039']
-                },
-                {
-                    'id': '9',
-                    'user_id': '4722387568',
-                    'user_name': 'yet another person',
-                    'game_id': '506455',
-                    'type': 'live',
-                    'title': 'testing',
-                    'viewer_count': 1,
-                    'started_at': '2020-08-18T05:45:34Z',
-                    'language': 'en',
-                    'thumbnail_url': 'https://static-cdn.jtvnw.net/previews-ttv/live_user_fonzworth_bentley-{width}x{height}.jpg',
-                    'tag_ids': ['6ea6bca4-4712-4ab9-a906-e3336a9d8039']
-                },
-                {
-                    'id': '10',
-                    'user_id': '4722387568',
-                    'user_name': 'yet another person',
-                    'game_id': '506455',
-                    'type': 'live',
-                    'title': 'testing',
-                    'viewer_count': 1,
-                    'started_at': '2020-08-18T05:45:34Z',
-                    'language': 'en',
-                    'thumbnail_url': 'https://static-cdn.jtvnw.net/previews-ttv/live_user_fonzworth_bentley-{width}x{height}.jpg',
-                    'tag_ids': ['6ea6bca4-4712-4ab9-a906-e3336a9d8039']
-                },
-                {
-                    'id': '11',
+                    'id': '32',
                     'user_id': '4722387568',
                     'user_name': 'yetanotherperson',
                     'game_id': '506455',
                     'type': 'live',
                     'title': 'testing',
                     'viewer_count': 1,
-                    'started_at': '2020-08-18T05:45:34Z',
-                    'language': 'en',
-                    'thumbnail_url': 'https://static-cdn.jtvnw.net/previews-ttv/live_user_fonzworth_bentley-{width}x{height}.jpg',
-                    'tag_ids': ['6ea6bca4-4712-4ab9-a906-e3336a9d8039']
-                },
-                {
-                    'id': '12',
-                    'user_id': '4722387568',
-                    'user_name': 'yetanotherperson',
-                    'game_id': '506455',
-                    'type': 'live',
-                    'title': 'testing',
-                    'viewer_count': 1,
-                    'started_at': '2020-08-18T05:45:34Z',
+                    'started_at': '2020-08-18T18:56:34Z',
                     'language': 'en',
                     'thumbnail_url': 'https://static-cdn.jtvnw.net/previews-ttv/live_user_fonzworth_bentley-{width}x{height}.jpg',
                     'tag_ids': ['6ea6bca4-4712-4ab9-a906-e3336a9d8039']
