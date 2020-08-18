@@ -9,6 +9,7 @@ import requests
 from discord import Embed
 from discord.ext import commands
 from services.settings import get_settings
+from .services import Twitch
 
 class Streaming(commands.Cog):
 
@@ -38,34 +39,23 @@ class Streaming(commands.Cog):
         resp = requests.get(
             f'{self.API_BASE}/streams', params=params, headers=headers)
         
-        if resp.status_code == 200:
-            streams = resp.json()['data']
-                
-            # Filter out banned streams
-            blessed_streams = []
+        twitch = Twitch()
+        streams = twitch.get_live_streams()
+
+        if streams:
             for stream in streams:
-                if stream['user_name'] not in self.EXCLUDED_STREAMERS:
-                    blessed_streams.append(stream)
-
-            if blessed_streams:
-                await context.send('__Here are all the live Twitch Streams for Killer Queen Black:__')
-
-                for stream in blessed_streams:
-                    link = f'https://twitch.tv/{stream["user_name"]}'
-                    embed = Embed(
-                        title=stream['title'], color=0x009051, url=link)
-                    embed.add_field(name='Streamer', value=stream['user_name'], inline=True)
-                    embed.add_field(name='Watching', value=stream['viewer_count'], inline=True)
-                    embed.add_field(name='Started At', value=stream['started_at'], inline=False)
-                    
-                    thumbnail = stream['thumbnail_url'].replace('{width}', '').replace('{height}', '')
-                    embed.set_thumbnail(url=thumbnail)
-                    
-                    await context.send(embed=embed)
-            else:
-                msg = 'Dreadfully sorry, no streams currenty live.'
-                await context.send(msg)
-
+                link = f'https://twitch.tv/{stream["user_name"]}'
+                embed = Embed(
+                    title=stream['title'], color=0x009051, url=link)
+                embed.add_field(name='Streamer', value=stream['user_name'], inline=True)
+                embed.add_field(name='Watching', value=stream['viewer_count'], inline=True)
+                embed.add_field(name='Started At', value=stream['started_at'], inline=False)
+                
+                thumbnail = stream['thumbnail_url'].replace('{width}', '').replace('{height}', '')
+                embed.set_thumbnail(url=thumbnail)
+                
+                await context.send(embed=embed)
         else:
-            msg = 'Dreadfully sorry, I ran into some sort of bedeviling error state!'
+            msg = 'Dreadfully sorry, no streams currenty live.'
             await context.send(msg)
+
