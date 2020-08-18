@@ -19,15 +19,21 @@ from .models import Stream
 class Streaming(commands.Cog):
 
     def __init__(self, bot):
-        self.announce.start()
-        self.bot = bot
 
         settings = get_settings(['COGS', 'STREAMING'])
         self.EXCLUDED_STREAMERS = settings['EXCLUDED_STREAMERS']
         self.CHANNEL_ID = settings['ANNOUNCE_WENT_LIVE_CHANNEL_ID']
 
+        self.ENABLE_ANNOUNCE_TASK = settings['ENABLE_ANNOUNCE_TASK']
+        
+        if self.ENABLE_ANNOUNCE_TASK:
+            self.announce.start()
+        
+        self.bot = bot
+
     def cog_unload(self):
-        self.announce.cancel()
+        if self.ENABLE_ANNOUNCE_TASK:
+            self.announce.cancel()
 
     @commands.command()
     async def streams(self, context, *args):
