@@ -55,7 +55,7 @@ class Streaming(commands.Cog):
             await context.send(msg)
 
     @tasks.loop(seconds=10)
-    async def announce(self, context, *args):
+    async def announce(self):
         """
         Show a list of all live Twitch streams for game.
         """
