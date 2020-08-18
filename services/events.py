@@ -27,6 +27,31 @@ def get_matches_timeline(start=0, end=1500):
     
     return timeline
 
+def get_next_match():
+    """
+    Get the very next match on the calendar.
+
+    Connect to the KQB Calendar and convert all calendar data
+    to an Timeline generator
+
+    Keyword arguments:
+    start -- Beginning of timeline in minutes, relative to now. 0 means now. (int)
+    end -- End of timeline in minutes, relative to start. Default is 1500
+           (24 + 1 hour for event length). (int)
+    """
+    # Get next three months of matches, why not ¯\_(ツ)_/¯ 
+    upcoming_matches = get_matches_timeline(start=0, end=120960)
+    next_match = []
+    
+    for idx, match in enumerate(upcoming_matches):
+        if idx == 0:
+            next_match.append(match)
+        else:
+            if match.begin == next_match[0].begin:
+                next_match.append(match)
+
+    return next_match
+
 def get_match_embed_dict(entry):
     """
     Return dictionary of match times and discord embeds given timelie entry.

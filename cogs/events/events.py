@@ -4,7 +4,8 @@ import arrow
 import requests
 from discord.ext import commands, tasks
 from services.settings import get_settings
-from services.events import get_matches_timeline, get_match_embed_dict
+from services.events import (
+    get_matches_timeline, get_match_embed_dict, get_next_match)
 import logging
 
 class Events(commands.Cog):
@@ -36,22 +37,24 @@ class Events(commands.Cog):
 
         # Only Show next upcoming match if 'next' argument passed
         if 'next' in args:
-            just_next_matches = []
+            next_matches = get_next_match()
             
-            for idx, match in enumerate(matches):
-                if idx == 0:
-                    just_next_matches.append(match)
-                else:
-                    if match['begin_time'] == matches[0]['begin_time']:
-                        just_next_matches.append(match)
+            for match in next_matches:
+                matches.append(
+                    get_match_embed_dict(match)
+                )
 
-            matches = just_next_matches
-
+            
             if len(matches) == 1: 
                 msg = '__Here is next upcoming match:__'
-            else:
+            elif len(matches) > 1: 
                 msg = '__Here are the next upcoming matches (double-booked):__'
-            
+            else: 
+                msg = ':sob: No next match in the upcoming 24 hours :sob:'
+        
+        # Catch case where there are no matches:
+        if len(matches) == 0:
+            msg = ':sob: No matches in the next 24 hours :sob:'
         
         await context.send(msg)
 
