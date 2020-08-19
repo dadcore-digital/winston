@@ -23,10 +23,10 @@ class Events(commands.Cog):
     def cog_unload(self):
         self.announce.cancel()
 
-    @commands.command()
+    @commands.group(invoke_without_command=True)
     async def matches(self, context, *args):
         """
-        Show all matches in next 24 hours. Try `matches next` to see just next upcoming match.
+        Show all matches in next 24 hours.
         """
         timeline = get_matches_timeline()
         msg = '__Here are the matches for the next 24 hours:__'
@@ -34,23 +34,6 @@ class Events(commands.Cog):
         matches = []
         for entry in timeline:
             matches.append(get_match_embed_dict(entry))
-
-        # Only Show next upcoming match if 'next' argument passed
-        if 'next' in args:
-            next_matches = get_next_match()
-            
-            for match in next_matches:
-                matches.append(
-                    get_match_embed_dict(match)
-                )
-
-            
-            if len(matches) == 1: 
-                msg = '__Here is next upcoming match:__'
-            elif len(matches) > 1: 
-                msg = '__Here are the next upcoming matches (double-booked):__'
-            else: 
-                msg = ':sob: No next match in the upcoming 24 hours :sob:'
         
         # Catch case where there are no matches:
         if len(matches) == 0:
@@ -60,7 +43,30 @@ class Events(commands.Cog):
 
         for match in matches:
             await context.send(embed=match['embed'])
-    
+
+    @matches.command()
+    async def next(self, context, *args):
+        """
+        Show the very next match on the calendar.
+        """
+        matches = []
+        next_matches = get_next_match()
+        
+        for match in next_matches:
+            matches.append(
+                get_match_embed_dict(match)
+            )
+
+        if len(matches) == 1: 
+            msg = '__Here is next upcoming match:__'
+        elif len(matches) > 1: 
+            msg = '__Here are the next upcoming matches (double-booked):__'
+        else: 
+            msg = ':sob: No scheduled matches in the upcoming 3 months...seriously? :sob:'
+
+        for match in matches:
+            await context.send(embed=match['embed'])
+
     @tasks.loop(seconds=60.0)
     async def announce(self):
         try:

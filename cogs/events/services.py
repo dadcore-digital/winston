@@ -88,3 +88,4 @@ def get_match_embed_dict(entry):
         embed.add_field(name='Details', value=description, inline=False)
 
     return {'begin_time': begin_time, 'embed': embed}
+    
