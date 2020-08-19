@@ -4,7 +4,7 @@ import arrow
 import requests
 from discord.ext import commands, tasks
 from services.settings import get_settings
-from services.events import (
+from .services import (
     get_matches_timeline, get_match_embed_dict, get_next_match)
 import logging
 

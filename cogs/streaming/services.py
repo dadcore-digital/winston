@@ -2,13 +2,16 @@ import requests
 from discord import Embed
 from services.settings import get_settings
 
-def get_stream_embed(stream_dict):
+def get_stream_embed(stream_dict, view_count=True):
 
     link = f'https://twitch.tv/{stream_dict["user_name"]}'
     embed = Embed(
         title=stream_dict['title'], color=0x009051, url=link)
     embed.add_field(name='Streamer', value=stream_dict['user_name'], inline=True)
-    embed.add_field(name='Watching', value=stream_dict['viewer_count'], inline=True)
+    
+    if view_count:
+        embed.add_field(name='Watching', value=stream_dict['viewer_count'], inline=True)
+    
     embed.add_field(name='Started At', value=stream_dict['started_at'], inline=False)
     
     thumbnail = stream_dict['thumbnail_url'].replace('{width}', '').replace('{height}', '')

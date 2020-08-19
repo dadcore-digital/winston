@@ -7,9 +7,9 @@ from pyquery import PyQuery as pq
 import discord
 from discord import Embed
 from discord.ext import commands
-from services.chance import (
-    build_dice_roll_image, get_coin_flip_image, answer_flip_question)
 from services.settings import get_settings
+from .services import (
+    build_dice_roll_image, get_coin_flip_image, answer_flip_question)
 
 class Chance(commands.Cog):
 

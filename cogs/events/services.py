@@ -1,7 +1,7 @@
 import re
 import arrow
 import requests
-from .settings import get_settings
+from services.settings import get_settings
 from ics import Calendar
 from discord import Embed
 
