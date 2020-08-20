@@ -22,7 +22,7 @@ def get_match_menu_pages(matches):
                (list)
     """    
     pages = PermissiveMenuPages(
-        source=MatchListSource(matches), clear_reactions_after=True)
+        MatchListSource(matches), clear_reactions_after=True)
 
     pages.remove_button('\N{BLACK LEFT-POINTING DOUBLE TRIANGLE WITH VERTICAL BAR}\ufe0f')
     pages.remove_button('\N{BLACK RIGHT-POINTING DOUBLE TRIANGLE WITH VERTICAL BAR}\ufe0f')
