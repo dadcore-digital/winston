@@ -1,3 +1,4 @@
+import arrow
 import requests
 from discord import Embed
 from services.settings import get_settings
@@ -12,7 +13,11 @@ def get_stream_embed(stream_dict, view_count=True):
     if view_count:
         embed.add_field(name='Watching', value=stream_dict['viewer_count'], inline=True)
     
-    embed.add_field(name='Started At', value=stream_dict['started_at'], inline=False)
+    present = arrow.utcnow()
+    start_time = arrow.get(stream_dict['started_at']) 
+    went_live =start_time.humanize(present, granularity=["hour", "minute"])   
+
+    embed.add_field(name='Went Live', value=went_live, inline=False)
     
     thumbnail = stream_dict['thumbnail_url'].replace('{width}', '').replace('{height}', '')
     embed.set_thumbnail(url=thumbnail)

@@ -14,6 +14,7 @@ from discord.ext import commands, tasks
 from services.settings import get_settings
 from services import db
 from .services import get_stream_embed, Twitch
+from .menus import get_streams_menu_pages
 from .models import Stream
 
 class Streaming(commands.Cog):
@@ -51,10 +52,8 @@ class Streaming(commands.Cog):
 
         if blessed_streams:
             await context.send('__Here are all the live Twitch Streams for Killer Queen Black:__')
-
-            for stream in blessed_streams:
-                embed = get_stream_embed(stream)
-                await context.send(embed=embed)
+            pages = get_streams_menu_pages(blessed_streams)    
+            await pages.start(context)
 
         else:
             msg = 'Dreadfully sorry, no streams currenty live.'
@@ -71,7 +70,7 @@ class Streaming(commands.Cog):
             channel = self.bot.get_channel(self.CHANNEL_ID) 
 
             twitch = Twitch()
-            streams = twitch.get_live_streams()
+            streams = twitch.get_live_streams(view_count=False)
 
             prev_streams = await Stream.all().values_list(
                 'twitch_id', flat=True)
