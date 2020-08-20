@@ -3,9 +3,11 @@ from random import choice
 import arrow
 import requests
 from discord.ext import commands, tasks
+from services.menus import PermissiveMenuPages
 from services.settings import get_settings
 from .services import (
     get_matches_timeline, get_match_embed_dict, get_next_match)
+from .menus import get_match_menu_pages
 import logging
 
 class Events(commands.Cog):
@@ -26,7 +28,7 @@ class Events(commands.Cog):
     @commands.group(invoke_without_command=True)
     async def matches(self, context, *args):
         """
-        Show all matches in next 24 hours.
+        Show all matches in next 24 hours, paginated.
         """
         timeline = get_matches_timeline()
         msg = '__Here are the matches for the next 24 hours:__'
@@ -34,13 +36,35 @@ class Events(commands.Cog):
         matches = []
         for entry in timeline:
             matches.append(get_match_embed_dict(entry))
-        
+
         # Catch case where there are no matches:
         if len(matches) == 0:
             msg = ':sob: No matches in the next 24 hours :sob:'
         
         await context.send(msg)
 
+        if matches:
+            pages = get_match_menu_pages(matches)
+            await pages.start(context)
+
+
+    @matches.command()
+    async def full(self, context, *args):
+        """
+        Show all matches in next 24 hours non-paginated.
+        """
+        timeline = get_matches_timeline()
+        msg = '__Here are the matches for the next 24 hours:__'
+
+        matches = []
+        for entry in timeline:
+            matches.append(get_match_embed_dict(entry))
+
+        # Catch case where there are no matches:
+        if len(matches) == 0:
+            msg = ':sob: No matches in the next 24 hours :sob:'
+        
+        await context.send(msg)
         for match in matches:
             await context.send(embed=match['embed'])
 
@@ -64,8 +88,50 @@ class Events(commands.Cog):
         else: 
             msg = ':sob: No scheduled matches in the upcoming 3 months...seriously? :sob:'
 
-        for match in matches:
-            await context.send(embed=match['embed'])
+        await context.send(msg)
+
+        if len(matches) == 1:
+            await context.send(embed=matches[0]['embed'])
+        
+        elif len(matches) > 1:
+            pages = get_match_menu_pages(matches)
+            await pages.start(context)
+
+
+    @matches.command()
+    async def tomorrow(self, context, *args):
+        """
+        Show all matches for tomorrow, plus a few hours to spare.
+        """
+        et_now = arrow.now('US/Eastern')
+        tomorrow_begin_et = et_now.shift(hours=-5).shift(days=1).floor('day')
+        tomorrow_end_et = tomorrow_begin_et.ceil('day')
+        tomorrow_end_et = tomorrow_end_et.shift(hours=6)
+
+        tomorrow_begin_utc = tomorrow_begin_et.to('UTC')
+        tomorrow_end_utc = tomorrow_end_et.to('UTC')
+
+        start = (tomorrow_begin_utc - arrow.now()).total_seconds() /60
+        end = (tomorrow_end_utc - arrow.now()).total_seconds() /60
+
+        timeline = get_matches_timeline(start=start, end=end)
+
+        msg = '__Here are the matches for tomorrow:__'
+
+        matches = []
+        for entry in timeline:
+            matches.append(get_match_embed_dict(entry))
+
+        # Catch case where there are no matches:
+        if len(matches) == 0:
+            msg = ':sob: No matches tomorrow :sob:'
+        
+        await context.send(msg)
+
+        if matches:
+            pages = get_match_menu_pages(matches)
+            await pages.start(context)
+
 
     @tasks.loop(seconds=60.0)
     async def announce(self):
