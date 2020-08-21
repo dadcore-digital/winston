@@ -1,4 +1,5 @@
 import arrow
+import re
 import requests
 from discord import Embed
 from services.settings import get_settings
@@ -15,7 +16,8 @@ def get_stream_embed(stream_dict, view_count=True):
     
     present = arrow.utcnow()
     start_time = arrow.get(stream_dict['started_at']) 
-    went_live =start_time.humanize(present, granularity=["hour", "minute"])   
+    went_live =start_time.humanize(present, granularity=["hour", "minute"])
+    went_live = re.sub(r'^0 hours and ', '', went_live)
 
     embed.add_field(name='Went Live', value=went_live, inline=False)
     
