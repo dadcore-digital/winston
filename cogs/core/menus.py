@@ -47,7 +47,7 @@ class PinsMenuPages(menus.MenuPages):
         self.current_page = 0
         super().__init__(source, timeout=None, **kwargs)
 
-    @menus.button('\N{WHITE HEAVY CHECK MARK}', position=Last(0))
+    @menus.button('\N{WHITE HEAVY CHECK MARK}', position=Last(1))
     async def on_select_pin(self, payload):
         selected_pin = self.source.entries[self.current_page]
         pin_created = arrow.get(selected_pin.created_at).humanize(granularity=['day', 'hour', 'minute']) 
@@ -76,7 +76,12 @@ class PinsMenuPages(menus.MenuPages):
             msg += f'\n{attachment.url}'
 
         await self.message.edit(content=msg, embed=embed)
-        
+        await self.message.clear_reactions()
+        self.stop()
+
+    @menus.button('\N{NO ENTRY SIGN}', position=Last(0))
+    async def on_cancel(self, payload):
+        await self.message.delete()
         self.stop()
 
 def get_pins_menu_pages(pins):
