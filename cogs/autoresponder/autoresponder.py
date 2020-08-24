@@ -146,6 +146,11 @@ class AutoResponder(commands.Cog):
             bracket_name = args[0].upper()
             spreadsheet = settings['BRACKETS'][bracket_name]
 
+            tier, circuit = bracket_name[0], bracket_name[1]
+
+            verbose_bracket_name = f'Tier {tier}'
+            verbose_bracket_name += ' East' if circuit == 'E' else ' West'
+
             msg = f'Trying to retrieve bracket **{bracket_name}**. I beg your patience, it may take a moment or two.'
             await context.send(msg)
 
@@ -174,7 +179,7 @@ class AutoResponder(commands.Cog):
             # embed.set_image(url=f'attachment://bracket-{bracket_name}.png', width=900)
             # await context.send(file=file, embed=embed)            
             
-            msg = f'**Bracket {bracket_name}**'
+            msg = f'**Bracket for {verbose_bracket_name}**'
 
             await context.send(msg,
                 file=discord.File(image_as_buffer, f'bracket-{bracket_name}.png'))
