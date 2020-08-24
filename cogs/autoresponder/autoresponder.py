@@ -163,7 +163,7 @@ class AutoResponder(commands.Cog):
 
             image = Image.open(io.BytesIO(response.content))
             top = 175
-            bottom = 680
+            bottom = 810
             left = 50
             right = 1380
 
