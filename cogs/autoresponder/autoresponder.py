@@ -1,6 +1,10 @@
+import uuid
+import io
 import requests
 from random import choice
+from PIL import Image
 from pyquery import PyQuery as pq
+import discord
 from discord.ext import commands
 from tabulate import tabulate
 from tortoise.exceptions import DoesNotExist
@@ -129,3 +133,57 @@ class AutoResponder(commands.Cog):
         await context.send(msg)
         await db.close()
 
+
+    @commands.command()
+    async def bracket(self, context, *args):
+        """
+        Latest bracket by Tier. e.g."!bracket 2E", just "!bracket" for a list. 
+        """
+        width = 1400
+
+        if args:
+
+            bracket_name = args[0].upper()
+            spreadsheet = settings['BRACKETS'][bracket_name]
+
+            msg = f'Trying to retreive bracket **{bracket_name}**. I beg your patience, it may take a moment or two.'
+            await context.send(msg)
+
+            url = f'https://image.thum.io/get/width/{width}/viewportWidth/{width}/png/{spreadsheet}'
+            
+            # Append random to bust cache
+            url += f'?random={uuid.uuid4().hex}'
+
+            response = requests.get(url)
+
+            image = Image.open(io.BytesIO(response.content))
+            top = 175
+            bottom = 680
+            left = 50
+            right = 1380
+
+            image = image.crop((left, top, right, bottom)) 
+
+            image_as_buffer = io.BytesIO()
+
+            image.save(image_as_buffer, format='PNG')
+            image_as_buffer.seek(0)
+
+            # file = discord.File(image_as_buffer, filename=f'bracket-{bracket_name}.png')
+            # embed = discord.Embed()
+            # embed.set_image(url=f'attachment://bracket-{bracket_name}.png', width=900)
+            # await context.send(file=file, embed=embed)            
+            
+            await context.send(
+                file=discord.File(image_as_buffer, f'bracket-{bracket_name}.png'))
+
+        else:
+            commands = ''
+            
+            for key in settings['BRACKETS']:
+                commands += f' `!bracket {key}`,'
+
+            commands = commands.rstrip(',')
+
+            msg = f'Ah yes, try one of the following: {commands}.'
+            await context.send(msg)
