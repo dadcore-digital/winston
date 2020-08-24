@@ -146,7 +146,7 @@ class AutoResponder(commands.Cog):
             bracket_name = args[0].upper()
             spreadsheet = settings['BRACKETS'][bracket_name]
 
-            msg = f'Trying to retreive bracket **{bracket_name}**. I beg your patience, it may take a moment or two.'
+            msg = f'Trying to retrieve bracket **{bracket_name}**. I beg your patience, it may take a moment or two.'
             await context.send(msg)
 
             url = f'https://image.thum.io/get/width/{width}/viewportWidth/{width}/png/{spreadsheet}'
