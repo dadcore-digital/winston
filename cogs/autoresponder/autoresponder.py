@@ -174,7 +174,9 @@ class AutoResponder(commands.Cog):
             # embed.set_image(url=f'attachment://bracket-{bracket_name}.png', width=900)
             # await context.send(file=file, embed=embed)            
             
-            await context.send(
+            msg = f'**Bracket {bracket_name}**'
+
+            await context.send(msg,
                 file=discord.File(image_as_buffer, f'bracket-{bracket_name}.png'))
 
         else:
@@ -184,6 +186,6 @@ class AutoResponder(commands.Cog):
                 commands += f' `!bracket {key}`,'
 
             commands = commands.rstrip(',')
-
+            
             msg = f'Ah yes, try one of the following: {commands}.'
             await context.send(msg)
