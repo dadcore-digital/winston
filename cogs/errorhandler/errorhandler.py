@@ -39,7 +39,11 @@ class ErrorHandler(commands.Cog):
         # Anything in ignored will return and prevent anything happening.
         if isinstance(error, ignored):
             autoresponder = ctx.bot.cogs.get('AutoResponder')
-            await autoresponder.show(ctx, ctx.message.content.lstrip('!'))
+            msg = ctx.message.content.lstrip('!')
+            if msg == 'list':
+                await autoresponder.list(ctx)
+            else:
+                await autoresponder.show(ctx, msg)
             return
 
         if isinstance(error, commands.DisabledCommand):
@@ -50,11 +54,7 @@ class ErrorHandler(commands.Cog):
                 await ctx.author.send(f'{ctx.command} can not be used in Private Messages.')
             except discord.HTTPException:
                 pass
-
-        # For this error example we check to see where it came from...
-        elif isinstance(error, commands.BadArgument):            
-            if ctx.command.qualified_name == 'tag list':  # Check if the command being invoked is 'tag list'
-                await ctx.send('I could not find that member. Please try again.')
+            
 
         else:
             # All other Errors not returned come here. And we can just print the default TraceBack.
