@@ -1,10 +1,31 @@
 {
-    "BOT_TOKEN": "YOURSECRETTOKENHERE",
-    "LOAD_COGS": ["Events", "Wiki", "AutoResponder", "Chance"],
+    "BOT_TOKEN": "YOURVERYLONGTOKENHERE",
+    "DATABASE_PATH": "/path/to/yourdb.sqlite3",
+    "LOG_FILE": "/path/to/winston.log",
+    "LOAD_COGS": ["Events", "Core", "Wiki", "AutoResponder", "Chance", "Streaming", "ErrorHandler"],
     "COGS": {
+        "AUTORESPONDER": {
+            "ROLES_CAN_EDIT": ["admin", "MOD", "Botperson"],
+            "BRACKETS": {
+                "1W": "https://docs.google.com/spreadsheets/d/1813_kzNbUgkaX8q6vy3bc6b9dd2hgWvSH3n9WLoZ-_U/",
+                "2W": "https://docs.google.com/spreadsheets/d/1I0DLTEFmmEa8TcdE4Eg87VSTUYDLtnaqtP7QNyrtHK4/",
+                "1E": "https://docs.google.com/spreadsheets/d/1Pp6pDVbwiKfWqWFssUvoAfz_pFz20gbI2jhreRGZ2Z0/",   
+                "2E": "https://docs.google.com/spreadsheets/d/13imxCgrNJvd6O2MgvlDPXLZ0PqLDVn-Wv6n8EYcQIqI/",
+                "3E": "https://docs.google.com/spreadsheets/d/13EimPQ7g2BEAPzZ-FXW5wokGnDbDTtdAmlB4o2EST9M/"
+            }
+        },
+        "CORE": {},
+        "STREAMING": {
+            "ANNOUNCE_WENT_LIVE_CHANNEL_ID": 123456,
+            "ENABLE_ANNOUNCE_TASK": true,
+            "CLIENT_ID": "abc123",
+            "OAUTH_TOKEN": "abc123",
+            "GAME_ID": "506455",
+            "EXCLUDED_STREAMERS": ""
+        },
         "EVENTS": {
             "ANNOUNCE_MATCH_MINS_BEFORE": 5,
-            "ANNOUNCE_MATCH_CHANNEL_ID": 1234567890,
+            "ANNOUNCE_MATCH_CHANNEL_ID": 123456,
             "ANNOUNCE_APOLOGY": [
                 "Dreadfully sorry but",
                 "Apologies for the intrusion, however",
@@ -23,7 +44,7 @@
                 "AWOOOOGA, AWOOOGA",
                 "yo dawg it's that time again",
                 "the Hype Machine is about to power up",
-                "I believe it's about get 'real all up in this piece'"
+                "I believe it's about to get 'real all up in this piece'"
             ],
             "MATCH_CALENDAR_ICS": "https://kqbdiscord.com/matches.ics"
         },
@@ -69,27 +90,27 @@
                     {
                         "stem": "should i",
                         "positive": "you **should**",
-                        "negative": "you **shouldn\"t**"
+                        "negative": "you **shouldn't**"
                     },
                     {
                         "stem": "should we",
                         "positive": "you **should**",
-                        "negative": "you **shouldn\"t**"
+                        "negative": "you **shouldn't**"
                     },
                     {
                         "stem": "is it",
                         "positive": "it **is**",
-                        "negative": "it **isn\"t**"
+                        "negative": "it **isn't**"
                     },
                     {
                         "stem": "are we",
                         "positive": "you **are**",
-                        "negative": "you **aren\"t**"
+                        "negative": "you **aren't**"
                     },
                     {
                         "stem": "play on",
                         "positive": "you **should** play on",
-                        "negative": "you **shouldn\"t** play on"
+                        "negative": "you **shouldn't** play on"
                     }
                 ],
                 "YES_VARIATIONS": [
