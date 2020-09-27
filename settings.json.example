@@ -1,6 +1,7 @@
 {
     "BOT_TOKEN": "YOURVERYLONGTOKENHERE",
     "DATABASE_PATH": "/path/to/yourdb.sqlite3",
+    "REQUESTS_TIMEOUT": 120,
     "LOG_FILE": "/path/to/winston.log",
     "LOAD_COGS": ["Events", "Core", "Wiki", "AutoResponder", "Chance", "Streaming", "ErrorHandler"],
     "COGS": {

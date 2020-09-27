@@ -159,7 +159,7 @@ class AutoResponder(commands.Cog):
             # Append random to bust cache
             url += f'?random={uuid.uuid4().hex}'
 
-            response = requests.get(url)
+            response = requests.get(url, timeout=context.bot.REQUESTS_TIMEOUT)
 
             image = Image.open(io.BytesIO(response.content))
             top = 175

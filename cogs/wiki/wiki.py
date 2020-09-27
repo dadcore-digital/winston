@@ -24,7 +24,7 @@ class Wiki(commands.Cog):
         query = '+'.join(args)
         search_url = self.SEARCH_URL + query
 
-        resp = requests.get(search_url)
+        resp = requests.get(search_url, timeout=context.bot.REQUESTS_TIMEOUT)
         doc = pq(resp.content)
         result_links = doc('.table-striped tr').find('a')
         
@@ -44,7 +44,7 @@ class Wiki(commands.Cog):
                             break
 
             result_url = f'{self.WIKI_BASE_URL}{result_path}'
-            resp = requests.get(result_url)
+            resp = requests.get(result_url, timeout=context.bot.REQUESTS_TIMEOUT)
             doc = pq(resp.content)
             article = doc('.wiki-article')
 

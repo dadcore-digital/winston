@@ -39,7 +39,7 @@ class Twitch:
 
         self.API_BASE = 'https://api.twitch.tv/helix'
     
-    def get_live_streams(self, simulate=False):
+    def get_live_streams(self, simulate=False, timeout=120):
         """Get a list of all live twitch streams for KQB."""
         
         if not simulate:
@@ -49,7 +49,7 @@ class Twitch:
                 'Client-ID': self.CLIENT_ID
             }
             resp = requests.get(
-                f'{self.API_BASE}/streams', params=params, headers=headers)
+                f'{self.API_BASE}/streams', params=params, headers=headers, timeout=timeout)
             
             if resp.status_code == 200:
                 streams = resp.json()['data']

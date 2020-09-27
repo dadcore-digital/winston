@@ -27,6 +27,9 @@ async def get_pre(bot, message):
 
 bot = commands.Bot(command_prefix=get_pre, case_insensitive=True)
 
+# Global Variables
+bot.REQUESTS_TIMEOUT = get_settings('REQUESTS_TIMEOUT')
+
 for cog in LOAD_COGS:
     class_name = cog
     module_name = f'cogs.{cog.lower()}.{cog.lower()}'

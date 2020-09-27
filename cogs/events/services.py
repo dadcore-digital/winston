@@ -5,7 +5,7 @@ from services.settings import get_settings
 from ics import Calendar
 from discord import Embed
 
-def get_matches_timeline(start=0, end=1500):
+def get_matches_timeline(start=0, end=1500, timeout=120):
     """
     Return a timeline of matches.
 
@@ -16,10 +16,11 @@ def get_matches_timeline(start=0, end=1500):
     start -- Beginning of timeline in minutes, relative to now. 0 means now. (int)
     end -- End of timeline in minutes, relative to start. Default is 1500
            (24 + 1 hour for event length). (int)
+    timeout -- Time in seconds before give up making request. (int)
     """
     settings = get_settings(['COGS', 'EVENTS'])
     calendar_url = settings['MATCH_CALENDAR_ICS']
-    ics_data = requests.get(calendar_url).text
+    ics_data = requests.get(calendar_url, timeout=timeout).text
     cal = Calendar(imports=ics_data)
     start = arrow.utcnow().shift(minutes=start).floor('minutes')
     end = start.shift(minutes=end)
