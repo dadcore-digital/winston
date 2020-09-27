@@ -10,13 +10,14 @@ from .services import (
 from .menus import get_match_menu_pages
 import logging
 
+settings = get_settings(['COGS', 'EVENTS'])
+MATCHES_COOLDOWN = settings['MATCHES_COOLDOWN']
+
 class Events(commands.Cog):
     def __init__(self, bot):
         self.announce.start()
         self.bot = bot
         
-        settings = get_settings(['COGS', 'EVENTS'])
-
         self.MINS_BEFORE = settings['ANNOUNCE_MATCH_MINS_BEFORE']
         self.CHANNEL_ID = settings['ANNOUNCE_MATCH_CHANNEL_ID']
         self.APOLOGY = settings['ANNOUNCE_APOLOGY']
@@ -25,6 +26,8 @@ class Events(commands.Cog):
     def cog_unload(self):
         self.announce.cancel()
 
+
+    @commands.cooldown(1.0, MATCHES_COOLDOWN, commands.BucketType.channel)
     @commands.group(invoke_without_command=True)
     async def matches(self, context, *args):
         """

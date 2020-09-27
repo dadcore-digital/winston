@@ -48,6 +48,17 @@ class ErrorHandler(commands.Cog):
 
         if isinstance(error, commands.DisabledCommand):
             await ctx.send(f'{ctx.command} has been disabled.')
+        
+        if isinstance(error, commands.CommandOnCooldown):
+            msg = ctx.message.clean_content 
+
+            retry_mins = round(error.retry_after / 60)  
+            plural = 's' if retry_mins > 1 else ''  
+
+            cooldown_name = error.cooldown.type.name 
+            await ctx.send(
+                f'`{msg}` is on cooldown for this {cooldown_name}. Pray try again in {retry_mins} minute{plural}, or DM me directly instead.')
+
 
         elif isinstance(error, commands.NoPrivateMessage):
             try:
