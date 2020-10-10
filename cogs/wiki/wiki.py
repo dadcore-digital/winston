@@ -3,6 +3,7 @@ import requests
 from pyquery import PyQuery as pq
 from discord import Embed
 from discord.ext import commands
+from .menus import get_results_menu_pages
 
 
 class Wiki(commands.Cog):
@@ -26,68 +27,29 @@ class Wiki(commands.Cog):
 
         resp = requests.get(search_url, timeout=context.bot.REQUESTS_TIMEOUT)
         doc = pq(resp.content)
-        result_links = doc('.table-striped tr').find('a')
-        
-        if result_links:
+        result_links = doc('.table-striped tr').find('td > a')
+
+        results = []
+        for link in result_links:
+            result_dict = {
+                'title': link.text,
+                'link': f'{self.WIKI_BASE_URL}{link.attrib["href"]}',
+                'summary': link.getnext().text_content(),
+                'path': link.attrib['href'],
+            }
+
             query_as_path = query.replace('+', '-')
+            top_result = query_as_path.lower() in result_dict['title'].lower()
+            result_dict['is_top'] = query_as_path.lower() in result_dict['title'].lower()
+            results.append(result_dict)
 
-            # Default to first search result, even though often wrong
-            result_path = result_links[0].attrib['href']
+        if results:
+            sorted_results = sorted(results, key = lambda i: not i['is_top']) 
 
-            # Path-ify search query and see if it matches URL path of
-            # any search result links, select this result instead.
-            for link in result_links:
-                if link.attrib:
-                    if 'href' in link.attrib.keys():
-                        if query_as_path in link.attrib['href']:
-                            result_path = link.attrib['href']
-                            break
 
-            result_url = f'{self.WIKI_BASE_URL}{result_path}'
-            resp = requests.get(result_url, timeout=context.bot.REQUESTS_TIMEOUT)
-            doc = pq(resp.content)
-            article = doc('.wiki-article')
 
-            # Remove related articles and table of contents if present
-            article = article.remove('.article-list').remove('.toc')
+            pages = get_results_menu_pages(results)    
+            await pages.start(context)
 
-            # Apply markdown formatting to HTML header levels
-            for header in article.find('h1'):
-                header.text = f'**{header.text}**'
-
-            for header in article.find('h2'):
-                header.text = f'*{header.text}*'
-
-            for header in article.find('h3'):
-                header.text = f'*{header.text}*'
-
-            if article:
-                article_title = doc('title').text().split('-')[0].strip()
-                article_text = article[0].text_content().strip()
-                article_text = re.sub(r'\n\n\n+', '\n', article_text)
-                article_text = article_text[:self.TRUNCATE_AT]
-                article_link = result_url
-
-                if len(article_text) >= self.TRUNCATE_AT:
-                    article_text += '...'
-
-                embed = Embed(title=article_title, color=0x009051, url=article_link)
-                embed.add_field(name='Summary', value=article_text, inline=False)
-
-                # Give top 5 results
-                
-                if len(result_links) > 1:
-                    other_results = "*All Results:*  "
-
-                    for link in result_links:
-                        if link.attrib:
-                            if 'href' in link.attrib.keys():
-                                other_results += f'<{self.WIKI_BASE_URL}{link.attrib["href"]}>, '
-                    
-                    other_results = other_results.rstrip(', ') 
-        if embed:
-            await context.send(embed=embed)
-            if other_results:
-                await context.send(other_results, embed=None)
         else:
             await context.send(msg)
