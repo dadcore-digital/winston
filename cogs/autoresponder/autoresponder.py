@@ -28,7 +28,7 @@ class AutoResponder(commands.Cog):
         """
         await db.open()
         try:
-            responses = await Response.filter(shortcut=args[0])
+            responses = await Response.filter(shortcut__iexact=args[0])
             response = choice(responses)
             await context.send(response.text)
         
