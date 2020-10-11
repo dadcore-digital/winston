@@ -37,7 +37,7 @@ class Wiki(commands.Cog):
                 'summary': link.getnext().text_content(),
                 'path': link.attrib['href'],
             }
-
+            
             query_as_path = query.replace('+', '-')
             top_result = query_as_path.lower() in result_dict['title'].lower()
             result_dict['is_top'] = query_as_path.lower() in result_dict['title'].lower()

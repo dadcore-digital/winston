@@ -1,9 +1,8 @@
 import asyncio
 import re
-from discord import Embed
 from discord.ext import menus
 from discord.ext.menus import Last
-
+from .services import build_result_embed
 
 class ResultsListSource(menus.ListPageSource):
     def __init__(self, data):
@@ -17,8 +16,7 @@ class ResultsListSource(menus.ListPageSource):
         offset = menu.current_page * self.per_page
         msg = f'__**Select a wiki search result [{menu.current_page + 1}/{self.get_max_pages()}]:**__\n\n'
 
-        embed = Embed(title=result['title'], color=0x874efe, url=result['link'])
-        embed.add_field(name='Excerpt', value=result['summary'])
+        embed = build_result_embed(result)
 
         return {'content': msg, 'embed': embed}
 
@@ -33,9 +31,7 @@ class ResultsMenuPages(menus.MenuPages):
     async def on_select_pin(self, payload):
         selected_result = self.source.entries[self.current_page]
 
-        embed = Embed(title=selected_result['title'], color=0x874efe, url=selected_result['link'])
-        embed.add_field(name='Excerpt', value=selected_result['summary'])
-
+        embed = build_result_embed(selected_result)
 
         await self.message.edit(content='', embed=embed)
         await self.message.clear_reactions()
