@@ -70,7 +70,7 @@ class Streaming(commands.Cog):
             channel = self.bot.get_channel(self.CHANNEL_ID) 
 
             twitch = Twitch()
-            streams = twitch.get_live_streams(view_count=False)
+            streams = twitch.get_live_streams()
 
             prev_streams = await Stream.all().values_list(
                 'twitch_id', flat=True)
@@ -110,8 +110,10 @@ class Streaming(commands.Cog):
                         'title': stream.title,
                         'viewer_count': stream.viewer_count,
                         'started_at': stream.started_at,
-                        'thumbnail_url': stream.thumbnail_url
-                    })
+                        'thumbnail_url': stream.thumbnail_url,
+                    },
+                        view_count=False
+                    )
 
                     msg = f'**{stream.user_name}** just went live!'
                     await channel.send(msg, embed=embed)
