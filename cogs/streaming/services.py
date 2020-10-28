@@ -53,7 +53,7 @@ class Twitch:
                 'grant_type': 'client_credentials',
                 'scope': ''
         }
-        req = requests.post(url, data)
+        req = requests.post(url, data, timeout=120)
         access_token = req.json()['access_token']
         
         # Store as global variable for later use. Also allow to use this object
