@@ -139,7 +139,7 @@ class AutoResponder(commands.Cog):
         """
         Latest bracket by Tier. e.g."!bracket 2E", just "!bracket" for a list. 
         """
-        width = 1400
+        width = 2000
 
         if args:
 
@@ -163,9 +163,9 @@ class AutoResponder(commands.Cog):
 
             image = Image.open(io.BytesIO(response.content))
             top = 175
-            bottom = 810
+            bottom = 1010
             left = 50
-            right = 1380
+            right = 1670
 
             image = image.crop((left, top, right, bottom)) 
 
