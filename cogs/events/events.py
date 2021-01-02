@@ -51,54 +51,54 @@ class Events(commands.Cog):
             await pages.start(context)
 
 
-    # @matches.command()
-    # async def full(self, context, *args):
-    #     """
-    #     Show all matches in next 24 hours non-paginated.
-    #     """
-    #     timeline = get_matches_timeline()
-    #     msg = '__Here are the matches for the next 24 hours:__'
+    @matches.command()
+    async def full(self, context, *args):
+        """
+        Show all matches in next 24 hours non-paginated.
+        """
+        matches = get_upcoming_matches(hours=24)
+        msg = '__Here are the matches for the next 24 hours:__'
 
-    #     matches = []
-    #     for entry in timeline:
-    #         matches.append(get_match_embed_dict(entry))
+        embeds = []
+        for match in matches:
+            embeds.append(get_match_embed_dict(match))
 
-    #     # Catch case where there are no matches:
-    #     if len(matches) == 0:
-    #         msg = ':sob: No matches in the next 24 hours :sob:'
+        # Catch case where there are no matches:
+        if len(matches) == 0:
+            msg = ':sob: No matches in the next 24 hours :sob:'
         
-    #     await context.send(msg)
-    #     for match in matches:
-    #         await context.send(embed=match['embed'])
+        await context.send(msg)
+        for embed in embeds:
+            await context.send(embed=match['embed'])
 
-    # @matches.command()
-    # async def next(self, context, *args):
-    #     """
-    #     Show the very next match on the calendar.
-    #     """
-    #     matches = []
-    #     next_matches = get_next_match()
+    @matches.command()
+    async def next(self, context, *args):
+        """
+        Show the very next match on the calendar.
+        """
+        matches = []
+        next_matches = get_next_match()
         
-    #     for match in next_matches:
-    #         matches.append(
-    #             get_match_embed_dict(match)
-    #         )
+        for match in next_matches:
+            matches.append(
+                get_match_embed_dict(match)
+            )
 
-    #     if len(matches) == 1: 
-    #         msg = '__Here is next upcoming match:__'
-    #     elif len(matches) > 1: 
-    #         msg = '__Here are the next upcoming matches (double-booked):__'
-    #     else: 
-    #         msg = ':sob: No scheduled matches in the upcoming 3 months...seriously? :sob:'
+        if len(matches) == 1: 
+            msg = '__Here is next upcoming match:__'
+        elif len(matches) > 1: 
+            msg = '__Here are the next upcoming matches (double-booked):__'
+        else: 
+            msg = ':sob: No scheduled matches in the upcoming 3 months...seriously? :sob:'
 
-    #     await context.send(msg)
+        await context.send(msg)
 
-    #     if len(matches) == 1:
-    #         await context.send(embed=matches[0]['embed'])
+        if len(matches) == 1:
+            await context.send(embed=matches[0]['embed'])
         
-    #     elif len(matches) > 1:
-    #         pages = get_match_menu_pages(matches)
-    #         await pages.start(context)
+        elif len(matches) > 1:
+            pages = get_match_menu_pages(matches)
+            await pages.start(context)
 
 
     # @matches.command()
