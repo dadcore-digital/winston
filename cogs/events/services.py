@@ -77,7 +77,7 @@ def get_match_embed_dict(match):
 
     # Primary Caster Name
     if match['primary_caster']:
-        casted_by = f"*{match['primary_caster']['name']}*"
+        casted_by = f"**{match['primary_caster']['name']}**"
 
         # Co-casters
         if match['secondary_casters']:
@@ -87,7 +87,7 @@ def get_match_embed_dict(match):
                 co_casters = "{} and {}".format(", ".join(
                     match['secondary_casters'][:-1]),
                     match['secondary_casters'][-1])
-            casted_by += f'\n_with {co_casters}_'
+            casted_by += f' _with {co_casters}_'
         
         # Stream Link
         if match['primary_caster']['stream_link']:
@@ -97,12 +97,12 @@ def get_match_embed_dict(match):
     match_time_arrow = arrow.get(match['start_time'])
     match_time = match_time_arrow.to('US/Eastern').format('ddd MMM Do @ h:mmA')
     embed = Embed(title=title, color=0x874efe, url=link)
-    embed.add_field(name='Time', value=f'{match_time} ET')
+    embed.add_field(name=':alarm_clock:  Match Time', value=f'{match_time} ET')
     embed.add_field(name='Countdown', value=match["time_until"])
     embed.add_field(name='Casted By', value=casted_by, inline=False)
     
     # Home Team
-    home_team_title = f":blue_square: {match['home']['name']}"
+    home_team_title = f":small_blue_diamond: {match['home']['name']}"
     home_team_summary = f"*{match['home']['wins']} Wins, {match['home']['losses']} Losses*"
 
     home_team_members = "{} and {}".format(", ".join(
@@ -113,15 +113,32 @@ def get_match_embed_dict(match):
     embed.add_field(name=home_team_title, value=home_team_summary, inline=False)
 
     # Away Team
-    away_team_title = f":orange_square: {match['away']['name']}"
+    away_team_title = f":small_orange_diamond:  {match['away']['name']}"
     away_team_summary = f"_{match['away']['wins']} Wins, {match['away']['losses']} Losses_"
 
     away_team_members = "{} and {}".format(", ".join(
         match['away']['members'][:-1]), match['away']['members'][-1]
     ).replace('_', '').replace('*', '')
     away_team_summary += f'\n{away_team_members}'
-
     embed.add_field(name=away_team_title, value=away_team_summary, inline=False)
 
+
+    et_match_time = match_time_arrow.to('US/Eastern').format('h:mmA')
+    ct_match_time = match_time_arrow.to('US/Central').format('h:mmA')
+    mt_match_time = match_time_arrow.to('US/Mountain').format('h:mmA')
+    pt_match_time = match_time_arrow.to('US/Pacific').format('h:mmA')
+    ht_match_time = match_time_arrow.to('US/Hawaii').format('h:mmA')
+    gmt_match_time = match_time_arrow.to('Europe/London').format('h:mmA')
+    cet_match_time = match_time_arrow.to('Europe/Berlin').format('h:mmA')
+
+    all_match_times = f'>>> :statue_of_liberty: {et_match_time} ET :black_small_square: '
+    all_match_times += f' :corn: {ct_match_time} CT :black_small_square: '
+    all_match_times += f' :mountain_snow:  {mt_match_time} MT :black_small_square: '
+    all_match_times += f' :ocean::  {pt_match_time} PT :black_small_square: '
+    all_match_times += f' :coconut:  {ht_match_time} HT :black_small_square: '
+    all_match_times += f' :guard: _{gmt_match_time} GMT :black_small_square: '
+    all_match_times += f' :chocolate_bar: {cet_match_time} CET'
+
+    embed.add_field(name='In Your Timezone', value=all_match_times, inline=False)
     return {'begin_time': match['start_time'], 'embed': embed}
     
