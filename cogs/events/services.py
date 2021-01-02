@@ -1,92 +1,127 @@
-import re
+from datetime import datetime
 import arrow
+import re
 import requests
 from services.settings import get_settings
 from ics import Calendar
 from discord import Embed
 
-def get_matches_timeline(start=0, end=1500, timeout=120):
+def get_upcoming_matches(minutes='', hours='', days=''):
     """
-    Return a timeline of matches.
-
-    Connect to the KQB Calendar and convert all calendar data
-    to an Timeline generator.
+    Get a list of matches from now until a certain time duration.
 
     Keyword arguments:
-    start -- Beginning of timeline in minutes, relative to now. 0 means now. (int)
-    end -- End of timeline in minutes, relative to start. Default is 1500
-           (24 + 1 hour for event length). (int)
-    timeout -- Time in seconds before give up making request. (int)
+    minutes -- Number of minutes ahead to look for start time of match. (int)
+    hours -- Number of hours ahead to look for start time of match. (int)
+    days -- Number of days ahead to look for start time of match. (int)
     """
-    settings = get_settings(['COGS', 'EVENTS'])
-    calendar_url = settings['MATCH_CALENDAR_ICS']
-    ics_data = requests.get(calendar_url, timeout=timeout).text
-    cal = Calendar(imports=ics_data)
-    start = arrow.utcnow().shift(minutes=start).floor('minutes')
-    end = start.shift(minutes=end)
-    timeline = cal.timeline.included(start, end)
+    API_BASE = get_settings(['BUZZ_API', 'BASE_URL'])
+    resp = requests.get(
+        f'{API_BASE}/matches/?minutes={minutes}&hours={hours}&days={days}&format=json'
+    ).json()
+    matches = resp['results']
+
+    # If paginated results presented, loop through and get all matches.    
+    if resp['next']:
+        while True:
+            resp = requests.get(resp['next']).json()
+            matches.append(['results'])
     
-    return timeline
+            if not resp['next']:
+                break
+    return matches
 
-def get_next_match():
+def get_next_match(days=90):
     """
-    Get the very next match on the calendar.
+    Get the very next scheduled match.
 
-    Connect to the KQB Calendar and convert all calendar data
-    to an Timeline generator
+    If there are multiple "next matches", e.g. two or more scheduled at the
+    same time, return them all.
 
     Keyword arguments:
-    start -- Beginning of timeline in minutes, relative to now. 0 means now. (int)
-    end -- End of timeline in minutes, relative to start. Default is 1500
-           (24 + 1 hour for event length). (int)
+    days -- Days ahead to scan for the next match (int)
     """
-    # Get next three months of matches, why not ¯\_(ツ)_/¯ 
-    upcoming_matches = get_matches_timeline(start=0, end=120960)
+    upcoming_matches = get_upcoming_matches(days=days)
     next_match = []
     
     for idx, match in enumerate(upcoming_matches):
         if idx == 0:
             next_match.append(match)
         else:
-            if match.begin == next_match[0].begin:
+            if match['start_time'] == next_match['start_time']:
                 next_match.append(match)
 
     return next_match
 
-def get_match_embed_dict(entry):
+def get_match_embed_dict(match):
     """
     Return dictionary of match times and discord embeds given timelie entry.
 
     Keyword arguments:
-    entry -- An instance of event/entry (not sure proper word) in a Timeline
-             generator.
+    match -- A match entry returned from the Buzz API.
     """
-    title = entry.name
+    circuit = match['circuit']['tier'] + match['circuit']['region']
+    title = f"{circuit} {match['home']['name']} @ {match['away']['name']} "
+    
+    # Trim just in case of wacky long team names
     title = title.ljust(200 - len(title), ' ')
     title += '\n'
-    begin_time = entry.begin.to('US/Eastern').format(
-        'ddd MMM Do @ h:mmA')
-    time_until = entry.begin.humanize(granularity=['hour', 'minute'])
-    stream = 'TBD'
 
     link = ''
-    try:
-        res = re.search('(https://twitch.tv/.*)\n', entry.description) 
-        if res:
-            link = res.groups()[0]  
-    except:
-        pass
+    if match['primary_caster']:
+        link = match['primary_caster']['stream_link']
 
+
+    # Caster Information
+    casted_by = 'n/a'
+
+    # Primary Caster Name
+    if match['primary_caster']:
+        casted_by = f"*{match['primary_caster']['name']}*"
+
+        # Co-casters
+        if match['secondary_casters']:
+            if len(match['secondary_casters']) == 1:
+                co_casters = match['secondary_casters'][0]
+            else:
+                co_casters = "{} and {}".format(", ".join(
+                    match['secondary_casters'][:-1]),
+                    match['secondary_casters'][-1])
+            casted_by += f'\n_with {co_casters}_'
+        
+        # Stream Link
+        if match['primary_caster']['stream_link']:
+            casted_by += f"\n{match['primary_caster']['stream_link']}"
+
+        
+    match_time_arrow = arrow.get(match['start_time'])
+    match_time = match_time_arrow.to('US/Eastern').format('ddd MMM Do @ h:mmA')
     embed = Embed(title=title, color=0x874efe, url=link)
-    embed.add_field(name='Time', value=f'{begin_time} ET')
-    embed.add_field(name='Countdown', value=time_until)
+    embed.add_field(name='Time', value=f'{match_time} ET')
+    embed.add_field(name='Countdown', value=match["time_until"])
+    embed.add_field(name='Casted By', value=casted_by, inline=False)
+    
+    # Home Team
+    home_team_title = f":blue_square: {match['home']['name']}"
+    home_team_summary = f"*{match['home']['wins']} Wins, {match['home']['losses']} Losses*"
 
-    if entry.description:
+    home_team_members = "{} and {}".format(", ".join(
+        match['home']['members'][:-1]), match['home']['members'][-1]
+    ).replace('_', '').replace('*', '')
+    home_team_summary += f'\n{home_team_members}'
 
-        # Handle inconsistent line breaks and split into list
-        description = entry.description.replace('<br>', '\n')
+    embed.add_field(name=home_team_title, value=home_team_summary, inline=False)
 
-        embed.add_field(name='Details', value=description, inline=False)
+    # Away Team
+    away_team_title = f":orange_square: {match['away']['name']}"
+    away_team_summary = f"_{match['away']['wins']} Wins, {match['away']['losses']} Losses_"
 
-    return {'begin_time': begin_time, 'embed': embed}
+    away_team_members = "{} and {}".format(", ".join(
+        match['away']['members'][:-1]), match['away']['members'][-1]
+    ).replace('_', '').replace('*', '')
+    away_team_summary += f'\n{away_team_members}'
+
+    embed.add_field(name=away_team_title, value=away_team_summary, inline=False)
+
+    return {'begin_time': match['start_time'], 'embed': embed}
     
