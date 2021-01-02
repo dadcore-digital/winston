@@ -97,7 +97,7 @@ def get_match_embed_dict(match):
     match_time_arrow = arrow.get(match['start_time'])
     match_time = match_time_arrow.to('US/Eastern').format('ddd MMM Do @ h:mmA')
     embed = Embed(title=title, color=0x874efe, url=link)
-    embed.add_field(name=':alarm_clock:  Match Time', value=f'{match_time} ET')
+    embed.add_field(name='Match Time :alarm_clock:', value=f'{match_time} ET')
     embed.add_field(name='Countdown', value=match["time_until"])
     embed.add_field(name='Casted By', value=casted_by, inline=False)
     

@@ -15,7 +15,7 @@ MATCHES_COOLDOWN = settings['MATCHES_COOLDOWN']
 
 class Events(commands.Cog):
     def __init__(self, bot):
-        # self.announce.start()
+        self.announce.start()
         self.bot = bot
         
         self.MINS_BEFORE = settings['ANNOUNCE_MATCH_MINS_BEFORE']
@@ -100,80 +100,33 @@ class Events(commands.Cog):
             pages = get_match_menu_pages(matches)
             await pages.start(context)
 
+    @tasks.loop(seconds=60.0)
+    async def announce(self):
+        try:
+            logging.info(
+                f'[EVENTS] Querying Buzz API events in the next {self.MINS_BEFORE} minutes')
 
-    # @matches.command()
-    # async def tomorrow(self, context, *args):
-    #     """
-    #     Show all matches for tomorrow, plus a few hours to spare.
-    #     """
-    #     et_now = arrow.now('US/Eastern')
-    #     tomorrow_begin_et = et_now.shift(hours=-5).shift(days=1).floor('day')
-    #     tomorrow_end_et = tomorrow_begin_et.ceil('day')
-    #     tomorrow_end_et = tomorrow_end_et.shift(hours=6)
+            channel = self.bot.get_channel(self.CHANNEL_ID) 
+            matches = get_upcoming_matches(minutes=self.MINS_BEFORE)
 
-    #     tomorrow_begin_utc = tomorrow_begin_et.to('UTC')
-    #     tomorrow_end_utc = tomorrow_end_et.to('UTC')
 
-    #     start = (tomorrow_begin_utc - arrow.now()).total_seconds() /60
-    #     end = (tomorrow_end_utc - arrow.now()).total_seconds() /60
+            if len(matches):
+                logging.info(f'[EVENTS] {len(matches)} events found!')
 
-    #     timeline = get_matches_timeline(start=start, end=end)
+                plural = 'es' if len(matches) > 1 else ''  
+                flavor = f'{choice(self.APOLOGY)}, {choice(self.HYPE)}!' 
+                msg = f'{flavor}\n:loudspeaker:  __Match{plural} happening in {self.MINS_BEFORE} Minutes!__'
+                await channel.send(msg)
 
-    #     msg = '__Here are the matches for tomorrow:__'
-
-    #     matches = []
-    #     for entry in timeline:
-    #         matches.append(get_match_embed_dict(entry))
-
-    #     # Catch case where there are no matches:
-    #     if len(matches) == 0:
-    #         msg = ':sob: No matches tomorrow :sob:'
+                for match in matches:
+                    await channel.send(embed=get_match_embed_dict(match)['embed'])
+            else:
+                logging.info(f'[EVENTS] 0 events found.')
         
-    #     await context.send(msg)
+        except Exception as error:
+            logging.info(f'!!! ERROR !!!: {error}')
 
-    #     if matches:
-    #         pages = get_match_menu_pages(matches)
-    #         await pages.start(context)
-
-
-    # @tasks.loop(seconds=60.0)
-    # async def announce(self):
-    #     try:
-    #         now = arrow.now()            
-    #         channel = self.bot.get_channel(self.CHANNEL_ID) 
-        
-    #         logging.info(f'[EVENTS] Downloading matches between \'{now.strftime("%Y-%m-%d %H:%M:%S")}\' and \'{now.shift(minutes=240).strftime("%Y-%m-%d %H:%M:%S")}\'')
-    #         timeline = get_matches_timeline(end=240)
-
-    #         matches = []
-
-    #         begin_range = arrow.now().floor('minute').shift(minutes=5)
-    #         end_range = begin_range.shift(minutes=1)
-    #         logging.info(f'[EVENTS] Examining matches for start times between \'{begin_range.strftime("%Y-%m-%d %H:%M:%S")}\' and \'{end_range.strftime("%Y-%m-%d %H:%M:%S")}\'')
-
-    #         for entry in timeline:
-
-    #             logging.info(f'[EVENTS] Evaluating {entry.name} @ {entry.begin}')
-
-    #             if entry.begin.is_between(begin_range, end_range, '[)'):
-    #                 logging.info(f'[EVENTS] !!! IN RANGE !!!: {entry.name} @ {entry.begin}')
-    #                 matches.append(get_match_embed_dict(entry))
-    #             else:
-    #                 logging.info(f'[EVENTS] NOT IN RANGE: {entry.name} @ {entry.begin}')
-
-    #         if len(matches):
-    #             plural = 'es' if len(matches) > 1 else ''  
-    #             flavor = f'{choice(self.APOLOGY)}, {choice(self.HYPE)}!' 
-    #             msg = f'{flavor}\n:loudspeaker:  __Match{plural} happening in {self.MINS_BEFORE} Minutes!__'
-    #             await channel.send(msg)
-
-    #             for match in matches:
-    #                 await channel.send(embed=match['embed'])
-
-    #     except Exception as error:
-    #         logging.info(f'!!! ERROR !!!: {error}')
-
-    # @announce.before_loop
-    # async def before_announce(self):
-    #     await self.bot.wait_until_ready()
+    @announce.before_loop
+    async def before_announce(self):
+        await self.bot.wait_until_ready()
 
