@@ -31,24 +31,23 @@ def get_upcoming_matches(minutes='', hours='', days=''):
                 break
     return matches
 
-def get_next_match(days=90):
+def get_next_match(upcoming_matches):
     """
-    Get the very next scheduled match.
+    Get the very next scheduled match, given a list of matches.
 
     If there are multiple "next matches", e.g. two or more scheduled at the
     same time, return them all.
 
     Keyword arguments:
-    days -- Days ahead to scan for the next match (int)
+    upcoming_matches -- A list of match dicts to consider as possible next matches
     """
-    upcoming_matches = get_upcoming_matches(days=days)
     next_match = []
-    
+
     for idx, match in enumerate(upcoming_matches):
         if idx == 0:
             next_match.append(match)
         else:
-            if match['start_time'] == next_match['start_time']:
+            if match['start_time'] == next_match[0]['start_time']:
                 next_match.append(match)
 
     return next_match

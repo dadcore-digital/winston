@@ -94,29 +94,35 @@ class Events(commands.Cog):
         """
         Show the very next match on the calendar.
         """
-        matches = []
-        next_matches = get_next_match()
-        
-        for match in next_matches:
-            matches.append(
-                get_match_embed(match)
-            )
+        api = API()
+        url = api.get_matches('days=90')
 
-        if len(matches) == 1: 
-            msg = '__Here is next upcoming match:__'
-        elif len(matches) > 1: 
-            msg = '__Here are the next upcoming matches (double-booked):__'
-        else: 
-            msg = ':sob: No scheduled matches in the upcoming 3 months...seriously? :sob:'
+        async with aiohttp.ClientSession() as cs:
+            async with cs.get(url) as r:
+                resp = await r.json()
+                upcoming_matches = resp['results']
 
-        await context.send(msg)
+                next_matches = get_next_match(upcoming_matches)
 
-        if len(matches) == 1:
-            await context.send(embed=matches[0]['embed'])
-        
-        elif len(matches) > 1:
-            pages = get_match_menu_pages(matches)
-            await pages.start(context)
+                embeds = []
+                for match in next_matches:
+                    embeds.append(get_match_embed(match))
+
+                if len(embeds) == 1: 
+                    msg = '__Here is next upcoming match:__'
+                elif len(embeds) > 1: 
+                    msg = '__Here are the next upcoming matches (double-booked):__'
+                else: 
+                    msg = ':sob: No scheduled matches in the upcoming 3 months...seriously? :sob:'
+
+                await context.send(msg)
+
+                if len(embeds) == 1:
+                    await context.send(embed=embeds[0])
+                
+                elif len(embeds) > 1:
+                    pages = get_match_menu_pages(embeds)
+                    await pages.start(context)
 
     @tasks.loop(seconds=60.0)
     async def announce(self):
