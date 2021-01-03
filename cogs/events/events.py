@@ -133,7 +133,7 @@ class Events(commands.Cog):
             channel = self.bot.get_channel(self.CHANNEL_ID) 
 
             buzz = Buzz()
-            url = buzz.matches('days=90&scheduled=true')
+            url = buzz.matches('starts_in_minutes=5')
 
             async with aiohttp.ClientSession() as cs:
                 async with cs.get(url) as r:
