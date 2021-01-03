@@ -53,7 +53,7 @@ def get_next_match(days=90):
 
     return next_match
 
-def get_match_embed_dict(match):
+def get_match_embed(match):
     """
     Return dictionary of match times and discord embeds given timelie entry.
 
@@ -140,5 +140,5 @@ def get_match_embed_dict(match):
     all_match_times += f' :chocolate_bar: {cet_match_time} CET'
 
     embed.add_field(name='In Your Timezone', value=all_match_times, inline=False)
-    return {'begin_time': match['start_time'], 'embed': embed}
+    return embed
     

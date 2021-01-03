@@ -8,7 +8,7 @@ class MatchListSource(menus.ListPageSource):
 
     async def format_page(self, menu, entry):
         offset = menu.current_page * self.per_page
-        embed = copy(entry['embed'])
+        embed = copy(entry)
         embed.title = f'{embed.title.strip()} ({menu.current_page + 1}/{self.get_max_pages()})' 
         return embed
 

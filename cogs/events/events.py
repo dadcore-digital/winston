@@ -1,14 +1,19 @@
+import aiohttp
+import asyncio
 from datetime import datetime
 from random import choice
 import arrow
 import requests
 from discord.ext import commands, tasks
+from services.api import API
 from services.menus import PermissiveMenuPages
 from services.settings import get_settings
 from .services import (
-    get_upcoming_matches, get_match_embed_dict, get_next_match)
+    get_upcoming_matches, get_match_embed, get_next_match)
 from .menus import get_match_menu_pages
 import logging
+
+from concurrent.futures import ProcessPoolExecutor
 
 settings = get_settings(['COGS', 'EVENTS'])
 MATCHES_COOLDOWN = settings['MATCHES_COOLDOWN']
@@ -33,22 +38,28 @@ class Events(commands.Cog):
         """
         Show all matches in next 24 hours, paginated.
         """
-        matches = get_upcoming_matches(hours=24)
-        msg = '__Here are the matches for the next 24 hours:__'
-
-        embeds = []
-        for match in matches:
-            embeds.append(get_match_embed_dict(match))
-
-        # Catch case where there are no matches:
-        if len(embeds) == 0:
-            msg = ':sob: No matches in the next 24 hours :sob:'
+        api = API()
+        url = api.get_matches('hours=24')
         
-        await context.send(msg)
+        async with aiohttp.ClientSession() as cs:
+            async with cs.get(url) as r:
+                resp = await r.json()
+                matches = resp['results']
+                msg = '__Here are the matches for the next 24 hours:__'
 
-        if embeds:
-            pages = get_match_menu_pages(embeds)
-            await pages.start(context)
+                embeds = []
+                for match in matches:
+                    embeds.append(get_match_embed(match))
+
+                # Catch case where there are no matches:
+                if len(embeds) == 0:
+                    msg = ':sob: No matches in the next 24 hours :sob:'
+                
+                await context.send(msg)
+
+                if embeds:
+                    pages = get_match_menu_pages(embeds)
+                    await pages.start(context)
 
 
     @matches.command()
@@ -56,20 +67,27 @@ class Events(commands.Cog):
         """
         Show all matches in next 24 hours non-paginated.
         """
-        matches = get_upcoming_matches(hours=24)
-        msg = '__Here are the matches for the next 24 hours:__'
+        api = API()
+        url = api.get_matches('hours=24')
 
-        embeds = []
-        for match in matches:
-            embeds.append(get_match_embed_dict(match))
+        async with aiohttp.ClientSession() as cs:
+            async with cs.get(url) as r:
+                resp = await r.json()
+                matches = resp['results']
 
-        # Catch case where there are no matches:
-        if len(matches) == 0:
-            msg = ':sob: No matches in the next 24 hours :sob:'
-        
-        await context.send(msg)
-        for embed in embeds:
-            await context.send(embed=match['embed'])
+                msg = '__Here are the matches for the next 24 hours:__'
+
+                embeds = []
+                for match in matches:
+                    embeds.append(get_match_embed(match))
+
+                # Catch case where there are no matches:
+                if len(matches) == 0:
+                    msg = ':sob: No matches in the next 24 hours :sob:'
+                
+                await context.send(msg)
+                for embed in embeds:
+                    await context.send(embed=embed)
 
     @matches.command()
     async def next(self, context, *args):
@@ -81,7 +99,7 @@ class Events(commands.Cog):
         
         for match in next_matches:
             matches.append(
-                get_match_embed_dict(match)
+                get_match_embed(match)
             )
 
         if len(matches) == 1: 
@@ -119,7 +137,7 @@ class Events(commands.Cog):
                 await channel.send(msg)
 
                 for match in matches:
-                    await channel.send(embed=get_match_embed_dict(match)['embed'])
+                    await channel.send(embed=get_match_embed(match)['embed'])
             else:
                 logging.info(f'[EVENTS] 0 events found.')
         
