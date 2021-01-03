@@ -5,7 +5,7 @@ from random import choice
 import arrow
 import requests
 from discord.ext import commands, tasks
-from services.api import API
+from services.buzz import Buzz
 from services.menus import PermissiveMenuPages
 from services.settings import get_settings
 from .services import (
@@ -38,8 +38,8 @@ class Events(commands.Cog):
         """
         Show all matches in next 24 hours, paginated.
         """
-        api = API()
-        url = api.get_matches('hours=24')
+        buzz = Buzz()
+        url = buzz.matches('hours=24')
         
         async with aiohttp.ClientSession() as cs:
             async with cs.get(url) as r:
@@ -67,8 +67,8 @@ class Events(commands.Cog):
         """
         Show all matches in next 24 hours non-paginated.
         """
-        api = API()
-        url = api.get_matches('hours=24')
+        buzz = Buzz()
+        url = buzz.matches('hours=24')
 
         async with aiohttp.ClientSession() as cs:
             async with cs.get(url) as r:
@@ -94,8 +94,8 @@ class Events(commands.Cog):
         """
         Show the very next match on the calendar.
         """
-        api = API()
-        url = api.get_matches('days=90')
+        buzz = Buzz()
+        url = buzz.matches('days=90')
 
         async with aiohttp.ClientSession() as cs:
             async with cs.get(url) as r:

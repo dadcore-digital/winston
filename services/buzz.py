@@ -1,9 +1,9 @@
 from services.settings import get_settings
 
-class API:
+class Buzz:
 
     def __init__(self):
         self.API_BASE = get_settings(['BUZZ_API', 'BASE_URL'])
     
-    def get_matches(self, params):
+    def matches(self, params):
         return f'{self.API_BASE}/matches/?{params}&format=json'
