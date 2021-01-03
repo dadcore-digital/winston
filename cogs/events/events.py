@@ -95,7 +95,7 @@ class Events(commands.Cog):
         Show the very next match on the calendar.
         """
         buzz = Buzz()
-        url = buzz.matches('days=90')
+        url = buzz.matches('days=90&scheduled=true')
 
         async with aiohttp.ClientSession() as cs:
             async with cs.get(url) as r:
@@ -131,21 +131,28 @@ class Events(commands.Cog):
                 f'[EVENTS] Querying Buzz API events in the next {self.MINS_BEFORE} minutes')
 
             channel = self.bot.get_channel(self.CHANNEL_ID) 
-            matches = get_upcoming_matches(minutes=self.MINS_BEFORE)
 
+            buzz = Buzz()
+            url = buzz.matches('days=90&scheduled=true')
 
-            if len(matches):
-                logging.info(f'[EVENTS] {len(matches)} events found!')
+            async with aiohttp.ClientSession() as cs:
+                async with cs.get(url) as r:
+                    resp = await r.json()
 
-                plural = 'es' if len(matches) > 1 else ''  
-                flavor = f'{choice(self.APOLOGY)}, {choice(self.HYPE)}!' 
-                msg = f'{flavor}\n:loudspeaker:  __Match{plural} happening in {self.MINS_BEFORE} Minutes!__'
-                await channel.send(msg)
+                    matches = resp['results']
 
-                for match in matches:
-                    await channel.send(embed=get_match_embed(match)['embed'])
-            else:
-                logging.info(f'[EVENTS] 0 events found.')
+                    if len(matches):
+                        logging.info(f'[EVENTS] {len(matches)} events found!')
+
+                        plural = 'es' if len(matches) > 1 else ''  
+                        flavor = f'{choice(self.APOLOGY)}, {choice(self.HYPE)}!' 
+                        msg = f'{flavor}\n:loudspeaker:  __Match{plural} happening in {self.MINS_BEFORE} Minutes!__'
+                        await channel.send(msg)
+
+                        for match in matches:
+                            await channel.send(embed=get_match_embed(match))
+                    else:
+                        logging.info(f'[EVENTS] 0 events found.')
         
         except Exception as error:
             logging.info(f'!!! ERROR !!!: {error}')
