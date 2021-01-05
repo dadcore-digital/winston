@@ -65,65 +65,31 @@ class Streaming(commands.Cog):
         """
         Show a list of all live Twitch streams for game.
         """
-        logging.info(f'[STREAMING] Checking for new Twitch streams...')
-        try:
-            await db.open()
-            channel = self.bot.get_channel(self.CHANNEL_ID) 
+        buzz = Buzz()
+        url = buzz.streams('started_n_minutes_ago=5&is_live=true&blessed=true')
 
-            twitch = Twitch()
-            streams = twitch.get_live_streams()
+        async with aiohttp.ClientSession() as cs:
+            async with cs.get(url) as r:
+                resp = await r.json()
+                streams = resp['results']
 
-            prev_streams = await Stream.all().values_list(
-                'twitch_id', flat=True)
+                channel = self.bot.get_channel(self.CHANNEL_ID) 
 
-            new_streams = []
-            logging.info(f'[STREAMING] Found {len(new_streams)} new streams.')
-            
-            for stream in streams:
-                if int(stream['id']) not in prev_streams:
-                    new_stream = await Stream.create(
-                        twitch_id = stream['id'],
-                        user_id = stream['user_id'],
-                        user_name = stream['user_name'],
-                        title = stream['title'],
-                        viewer_count = stream['viewer_count'],
-                        started_at = stream['started_at'],
-                        thumbnail_url = stream['thumbnail_url']
-                    )
-                    new_streams.append(new_stream)
+                for stream in streams:
 
-            # Filter out banned streams
-            blessed_new_streams = []
-            for stream in new_streams:
-                if stream.user_name not in self.EXCLUDED_STREAMERS:
-                    blessed_new_streams.append(stream)        
-            
-            for stream in blessed_new_streams:
-
-                # Sanity check before announcing
-                now = datetime.utcnow().replace(tzinfo=pytz.utc)
-                started_minutes_ago = (now - stream.started_at).seconds / 60
-                embeds = []
-                
-                if started_minutes_ago <= 5:
                     embed = get_stream_embed({
-                        'user_name': stream.user_name,
-                        'title': stream.title,
-                        'viewer_count': stream.viewer_count,
-                        'started_at': stream.started_at,
-                        'thumbnail_url': stream.thumbnail_url,
+                        'username': stream.user_name,
+                        'name': stream.title,
+                        'max_viewer_count': stream.viewer_count,
+                        'start_time': stream.started_at,
+                        'thumbnail': stream.thumbnail_url,
                     },
                         view_count=False
                     )
 
                     msg = f'**{stream.user_name}** just went live!'
                     await channel.send(msg, embed=embed)
-
-            await db.close()
         
-        except Exception as error:
-            logging.info(f'[STREAMING] !!! ERROR !!!: {error}')
-
     @announce.before_loop
     async def before_announce(self):
         await self.bot.wait_until_ready()
