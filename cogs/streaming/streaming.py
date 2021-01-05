@@ -1,3 +1,4 @@
+import aiohttp
 import asyncio
 from datetime import datetime
 import io
@@ -13,7 +14,8 @@ from discord import Embed
 from discord.ext import commands, tasks
 from services.settings import get_settings
 from services import db
-from .services import get_stream_embed, Twitch
+from services.buzz import Buzz
+from .services import get_stream_embed
 from .menus import get_streams_menu_pages
 from .models import Stream
 
@@ -41,23 +43,22 @@ class Streaming(commands.Cog):
         """
         Show a list of all live Twitch streams for game.
         """
-        twitch = Twitch()
-        streams = twitch.get_live_streams()
+        buzz = Buzz()
+        url = buzz.streams('is_live=true&blessed=true')
 
-        # Filter out banned streams
-        blessed_streams = []
-        for stream in streams:
-            if stream['user_name'] not in self.EXCLUDED_STREAMERS:
-                blessed_streams.append(stream)
+        async with aiohttp.ClientSession() as cs:
+            async with cs.get(url) as r:
+                resp = await r.json()
+                streams = resp['results']
 
-        if blessed_streams:
-            await context.send('__Here are all the live Twitch Streams for Killer Queen Black:__')
-            pages = get_streams_menu_pages(blessed_streams)    
-            await pages.start(context)
+                if streams:
+                    await context.send('__Here are all the live Twitch Streams for Killer Queen Black:__')
+                    pages = get_streams_menu_pages(streams)    
+                    await pages.start(context)
 
-        else:
-            msg = 'Dreadfully sorry, no streams currenty live.'
-            await context.send(msg)
+                else:
+                    msg = 'Dreadfully sorry, no streams currenty live.'
+                    await context.send(msg)
 
     @tasks.loop(seconds=10)
     async def announce(self):
