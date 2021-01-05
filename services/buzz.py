@@ -10,5 +10,6 @@ class Buzz:
 
     def streams(self, params):
         return f'{self.API_BASE}/streams/?{params}&format=json'
-    
-     
+
+    def playing(self):
+        return f'{self.API_BASE}/playing/?format=json'
