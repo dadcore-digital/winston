@@ -136,9 +136,8 @@ def get_match_embed(match):
     all_match_times += f' :mountain_snow:  {mt_match_time} MT :black_small_square: '
     all_match_times += f' :ocean::  {pt_match_time} PT :black_small_square: '
     all_match_times += f' :coconut:  {ht_match_time} HT :black_small_square: '
-    all_match_times += f' :guard: {gmt_match_time} GMT :black_small_square: '
-    all_match_times += f' :chocolate_bar: {cet_match_time} CET :black_small_square: '
-    all_match_times += f' ::kiwi: : {nzt_match_time} NZT'
+    all_match_times += f' :kiwi: {nzt_match_time} NZT  :black_small_square: '
+    all_match_times += f' :chocolate_bar: {cet_match_time} CET'
 
     embed.add_field(name='In Your Timezone', value=all_match_times, inline=False)
     return embed
