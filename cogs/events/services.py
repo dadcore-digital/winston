@@ -129,6 +129,7 @@ def get_match_embed(match):
     ht_match_time = match_time_arrow.to('US/Hawaii').format('h:mmA')
     gmt_match_time = match_time_arrow.to('Europe/London').format('h:mmA')
     cet_match_time = match_time_arrow.to('Europe/Berlin').format('h:mmA')
+    nzt_match_time = match_time_arrow.to('Pacific/Auckland').format('h:mmA')
 
     all_match_times = f'>>> :statue_of_liberty: {et_match_time} ET :black_small_square: '
     all_match_times += f' :corn: {ct_match_time} CT :black_small_square: '
@@ -136,7 +137,8 @@ def get_match_embed(match):
     all_match_times += f' :ocean::  {pt_match_time} PT :black_small_square: '
     all_match_times += f' :coconut:  {ht_match_time} HT :black_small_square: '
     all_match_times += f' :guard: {gmt_match_time} GMT :black_small_square: '
-    all_match_times += f' :chocolate_bar: {cet_match_time} CET'
+    all_match_times += f' :chocolate_bar: {cet_match_time} CET :black_small_square: '
+    all_match_times += f' ::kiwi: : {nzt_match_time} NZT'
 
     embed.add_field(name='In Your Timezone', value=all_match_times, inline=False)
     return embed
