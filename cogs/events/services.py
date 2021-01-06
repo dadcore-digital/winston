@@ -112,7 +112,7 @@ def get_match_embed(match):
     embed.add_field(name=home_team_title, value=home_team_summary, inline=False)
 
     # Away Team
-    away_team_title = f":small_orange_diamond:  {match['away']['name']}"
+    away_team_title = f":small_orange_diamond: {match['away']['name']}"
     away_team_summary = f"_{match['away']['wins']} Wins, {match['away']['losses']} Losses_"
 
     away_team_members = "{} and {}".format(", ".join(
@@ -135,7 +135,7 @@ def get_match_embed(match):
     all_match_times += f' :mountain_snow:  {mt_match_time} MT :black_small_square: '
     all_match_times += f' :ocean::  {pt_match_time} PT :black_small_square: '
     all_match_times += f' :coconut:  {ht_match_time} HT :black_small_square: '
-    all_match_times += f' :guard: _{gmt_match_time} GMT :black_small_square: '
+    all_match_times += f' :guard: {gmt_match_time} GMT :black_small_square: '
     all_match_times += f' :chocolate_bar: {cet_match_time} CET'
 
     embed.add_field(name='In Your Timezone', value=all_match_times, inline=False)
