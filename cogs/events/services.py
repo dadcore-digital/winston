@@ -60,7 +60,7 @@ def get_match_embed(match):
     match -- A match entry returned from the Buzz API.
     """
     circuit = match['circuit']['tier'] + match['circuit']['region']
-    title = f"{circuit} {match['home']['name']} @ {match['away']['name']} "
+    title = f"{circuit} {match['away']['name']} @ {match['home']['name']} "
     
     # Trim just in case of wacky long team names
     title = title.ljust(200 - len(title), ' ')
@@ -100,8 +100,18 @@ def get_match_embed(match):
     embed.add_field(name='Countdown', value=match["time_until"])
     embed.add_field(name='Casted By', value=casted_by, inline=False)
     
+    # Away Team
+    away_team_title = f":small_blue_diamond: {match['away']['name']}"
+    away_team_summary = f"_{match['away']['wins']} Wins, {match['away']['losses']} Losses_"
+
+    away_team_members = "{} and {}".format(", ".join(
+        match['away']['members'][:-1]), match['away']['members'][-1]
+    ).replace('_', '').replace('*', '')
+    away_team_summary += f'\n{away_team_members}'
+    embed.add_field(name=away_team_title, value=away_team_summary, inline=False)
+
     # Home Team
-    home_team_title = f":small_blue_diamond: {match['home']['name']}"
+    home_team_title = f":small_orange_diamond: {match['home']['name']}"
     home_team_summary = f"*{match['home']['wins']} Wins, {match['home']['losses']} Losses*"
 
     home_team_members = "{} and {}".format(", ".join(
@@ -110,16 +120,6 @@ def get_match_embed(match):
     home_team_summary += f'\n{home_team_members}'
 
     embed.add_field(name=home_team_title, value=home_team_summary, inline=False)
-
-    # Away Team
-    away_team_title = f":small_orange_diamond: {match['away']['name']}"
-    away_team_summary = f"_{match['away']['wins']} Wins, {match['away']['losses']} Losses_"
-
-    away_team_members = "{} and {}".format(", ".join(
-        match['away']['members'][:-1]), match['away']['members'][-1]
-    ).replace('_', '').replace('*', '')
-    away_team_summary += f'\n{away_team_members}'
-    embed.add_field(name=away_team_title, value=away_team_summary, inline=False)
 
 
     et_match_time = match_time_arrow.to('US/Eastern').format('h:mmA')
