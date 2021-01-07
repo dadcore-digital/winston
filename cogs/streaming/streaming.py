@@ -60,13 +60,18 @@ class Streaming(commands.Cog):
                     msg = 'Dreadfully sorry, no streams currenty live.'
                     await context.send(msg)
 
-    @tasks.loop(seconds=10)
+    @tasks.loop(seconds=60)
     async def announce(self):
         """
         Show a list of all live Twitch streams for game.
         """
+        MINS_BEFORE=0
         buzz = Buzz()
-        url = buzz.streams('started_n_minutes_ago=5&is_live=true&blessed=true')
+        url = buzz.streams(
+            f'started_n_minutes_ago={MINS_BEFORE}&is_live=true&blessed=true')
+
+        logging.info(
+            f'[STREAMS] Querying Buzz API for streams that started 0 {MINS_BEFORE} minutes ago')
 
         async with aiohttp.ClientSession() as cs:
             async with cs.get(url) as r:
@@ -74,6 +79,8 @@ class Streaming(commands.Cog):
                 streams = resp['results']
 
                 channel = self.bot.get_channel(self.CHANNEL_ID) 
+
+                logging.info(f'[STREAMS] {len(streams)} new live streams found!')
 
                 for stream in streams:
 
