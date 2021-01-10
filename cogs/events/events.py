@@ -13,8 +13,6 @@ from .services import (
 from .menus import get_match_menu_pages
 import logging
 
-from concurrent.futures import ProcessPoolExecutor
-
 settings = get_settings(['COGS', 'EVENTS'])
 MATCHES_COOLDOWN = settings['MATCHES_COOLDOWN']
 
@@ -30,7 +28,6 @@ class Events(commands.Cog):
     
     def cog_unload(self):
         self.announce.cancel()
-
 
     @commands.cooldown(1.0, MATCHES_COOLDOWN, commands.BucketType.channel)
     @commands.group(invoke_without_command=True)
