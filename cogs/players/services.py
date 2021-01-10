@@ -27,7 +27,7 @@ def get_player_summary_embed(player):
         embed.add_field(
             name='Pronouns', value=f"✨ {player['pronouns']}",            
         )
-    
+                
     if player['teams']:
         team_names = []
 
@@ -38,7 +38,23 @@ def get_player_summary_embed(player):
             name='Teams', value=format_list_as_commas(team_names),
             inline=False
         )
-    
+
+    # Social Media
+    if player['twitch_username'] or player['discord_username']:
+        social = ''
+
+        if player['discord_username']:
+            social += f"discord: *@{player['discord_username']}*\n"
+
+        if player['twitch_username']:
+            social += f"twitch: *{player['twitch_username']}*\n"
+
+        social = social.rstrip('\n')
+        
+        embed.add_field(
+            name='Internet Personality', value=f'>>> {social}', inline=False
+        )
+
     if player['aliases']:
         aliases = []
                 
