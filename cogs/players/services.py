@@ -96,11 +96,13 @@ def get_player_summary_embed(player):
                 if alias['name'] not in aliases:
                     aliases.append(alias['name'])
 
-        embed.add_field(
-            name='Also Answers To',
-            value=f'🕵️ {format_list_as_commas(aliases)}',
-            inline=False
-        )
+        # Might have weeded out the only alias in this case
+        if aliases:
+            embed.add_field(
+                name='Also Answers To',
+                value=f'🕵️ {format_list_as_commas(aliases)}',
+                inline=False
+            )
     
     if player['award_summary']:
         award_summary = ''
