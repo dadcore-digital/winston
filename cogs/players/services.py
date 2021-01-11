@@ -29,15 +29,48 @@ def get_player_summary_embed(player):
         )
                 
     if player['teams']:
-        team_names = []
+        current_teams = []
+        past_teams = []
 
+        
         for team in player['teams']:
-            team_names.append(team['name'])
+            if team['is_active']:
+                current_teams.append(team)
+            else:
+                past_teams.append(team)
 
-        embed.add_field(
-            name='Teams', value=format_list_as_commas(team_names),
-            inline=False
-        )
+        # Current Teams
+        if current_teams:
+            current_teams_display = ''
+            
+            for team in current_teams:
+                current_teams_display += f"{team['circuit_name_short']}\n_{team['name']}_\n\n"
+            
+            current_teams_display = current_teams_display.rstrip('\n\n')
+            
+            # Change to non-plural if only on one team currently
+            teams_embed_title = 'Teams'
+            if len(current_teams) == 1:
+                teams_embed_title = 'Team'
+                
+            embed.add_field(
+                name=teams_embed_title, value=f'{current_teams_display}',
+                inline=False
+            )
+
+        # Past Teams
+        if past_teams:
+            
+            past_team_names = []
+            for team in past_teams:
+                past_team_names.append(team['name'])    
+            
+            embed.add_field(
+                name='Once Upon A Team',
+                value=format_list_as_commas(past_team_names),
+                inline=False
+            )
+
 
     # Social Media
     if player['twitch_username'] or player['discord_username']:
