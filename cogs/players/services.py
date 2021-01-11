@@ -44,9 +44,9 @@ def get_player_summary_embed(player):
             current_teams_display = ''
             
             for team in current_teams:
-                current_teams_display += f"{team['circuit_name_short']}\n_{team['name']}_\n\n"
+                current_teams_display += f"[{team['circuit_abbrev']}] {team['name']}\n"
             
-            current_teams_display = current_teams_display.rstrip('\n\n')
+            current_teams_display = current_teams_display.rstrip('\n')
             
             # Change to non-plural if only on one team currently
             teams_embed_title = 'Teams'
@@ -54,7 +54,7 @@ def get_player_summary_embed(player):
                 teams_embed_title = 'Team'
                 
             embed.add_field(
-                name=teams_embed_title, value=f'{current_teams_display}',
+                name=teams_embed_title, value=f'>>> {current_teams_display}',
                 inline=False
             )
 
