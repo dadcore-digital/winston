@@ -12,6 +12,10 @@ class Players(commands.Cog):
         Learn more about a player community member. !player <player name>
         """
         player_name = args[0]
+        
+        # Handle player names with spaces, without requiring quotes
+        if len(args) > 1:
+             player_name = ' '.join(args) 
 
         buzz = Buzz()
         url = buzz.players(f'name={player_name}')        
