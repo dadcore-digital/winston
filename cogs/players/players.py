@@ -2,6 +2,7 @@ import aiohttp
 import asyncio
 from discord.ext import commands
 from services.buzz import Buzz
+from services.formatting import format_list_as_commas
 from .services import get_player_summary_embed
 
 class Players(commands.Cog):
@@ -22,8 +23,30 @@ class Players(commands.Cog):
                 
                 # Just naively return the first result for now
                 if len(players):
-                    
-                    embed = get_player_summary_embed(players[0])
+
+                    player = None
+                    name_list = []
+
+                    if len(players) == 1:
+                        player = players[0]
+
+                    # If more than one result found, use the result that 
+                    # *exactly* matches.
+                    if len(players) > 1:
+                        for entry in players:
+                            name_list.append(entry['name'])
+                            
+                            if entry['name'] == player_name:
+                                player = entry                                
+                                break
+                        
+                        # No exact match found
+                        if not player:
+                            msg = f'Found multiple results for **{player_name}**. Pray try narrowing your search.\n\n'
+                            msg += f'>>> **Results**\n*{format_list_as_commas(name_list[:8])}*'
+                            await context.send(msg)
+
+                    embed = get_player_summary_embed(player)
                     await context.send(embed=embed)
 
                 else:

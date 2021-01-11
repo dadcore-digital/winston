@@ -77,7 +77,7 @@ def get_player_summary_embed(player):
         award_summary = award_summary.rstrip('\n')
 
         embed.add_field(
-            name='Awards',
+            name='Trophy Shelf',
             value=f'>>> {award_summary}',
             inline=False
         )
