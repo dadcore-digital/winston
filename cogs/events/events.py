@@ -121,6 +121,7 @@ class Events(commands.Cog):
                     pages = get_match_menu_pages(embeds)
                     await pages.start(context)
 
+    @commands.cooldown(1.0, 0, commands.BucketType.channel)
     @matches.command()
     async def team(self, context, *args):
         """
