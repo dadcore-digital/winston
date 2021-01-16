@@ -4,6 +4,10 @@ class Buzz:
 
     def __init__(self):
         self.API_BASE = get_settings(['BUZZ_API', 'BASE_URL'])
+        self.LEAGUE = get_settings(
+            ['BUZZ_API', 'DEFAULT_LEAGUE']).replace(' ', '+')
+        self.SEASON = get_settings(
+            ['BUZZ_API', 'DEFAULT_SEASON']).replace(' ', '+')
     
     def matches(self, params):
         return f'{self.API_BASE}/matches/?{params}&format=json'

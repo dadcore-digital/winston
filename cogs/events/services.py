@@ -67,8 +67,15 @@ def get_match_embed(match):
     title += '\n'
 
     link = ''
-    if match['primary_caster']:
-        link = match['primary_caster']['stream_link']
+    if match['result']:
+        if match['vod_link']:
+            if match['vod_link'].startswith('http'):
+                link = match['vod_link']
+        elif match['primary_caster']:
+            link = f"{match['primary_caster']['stream_link']}/videos"
+    else:
+        if match['primary_caster']:
+            link = match['primary_caster']['stream_link']
 
 
     # Caster Information
@@ -92,14 +99,41 @@ def get_match_embed(match):
         if match['primary_caster']['stream_link']:
             casted_by += f"\n{match['primary_caster']['stream_link']}"
 
-        
+    embed = Embed(title=title, color=0x874efe, url=link)
+
+    # Determine match start time
     match_time_arrow = arrow.get(match['start_time'])
     match_time = match_time_arrow.to('US/Eastern').format('ddd MMM Do @ h:mmA')
-    embed = Embed(title=title, color=0x874efe, url=link)
-    embed.add_field(name='Match Time :alarm_clock:', value=f'{match_time} ET')
-    embed.add_field(name='Countdown', value=match["time_until"])
+
+    # Match is completed and played
+    if match['start_time'] and match['result']:
+        embed.add_field(name='Match Time', value=f"{match_time} ET")
+        embed.add_field(name='Round', value=match['round']['name'])
+    
+    # Countdown Field
+    elif match['start_time'] and not match['result']:
+        embed.add_field(name='Match Time', value=f"{match_time} ET")
+        embed.add_field(name='Countdown', value=match["time_until"])
+    
+    # Match is scheduled but played
+    elif not match['start_time']:
+        embed.add_field(name='Round', value=match['round']['name'])
+
+    # Try to be smart about VOD link
+    if match['result']:
+        vod_text = ''
+        if match['vod_link']:
+            vod_text = match['vod_link']
+        elif match['primary_caster']:
+            vod_text = f"Check {match['primary_caster']['stream_link']}/videos"
+
+        embed.add_field(name='VOD', value=vod_text, inline=False)
+
+
+    # Casting Info
     embed.add_field(name='Casted By', value=casted_by, inline=False)
     
+
     # Away Team
     away_team_title = f":small_blue_diamond: {match['away']['name']}"
     away_team_summary = f"_{match['away']['wins']} Wins, {match['away']['losses']} Losses_"
@@ -120,25 +154,34 @@ def get_match_embed(match):
     home_team_summary += f'\n{home_team_members}'
 
     embed.add_field(name=home_team_title, value=home_team_summary, inline=False)
+    
+    
+    # In Your Timezone
+    # Only show if you match has a start time, and no result
+    if match['start_time'] and not match['result']:
+        et_match_time = match_time_arrow.to('US/Eastern').format('h:mmA')
+        ct_match_time = match_time_arrow.to('US/Central').format('h:mmA')
+        mt_match_time = match_time_arrow.to('US/Mountain').format('h:mmA')
+        pt_match_time = match_time_arrow.to('US/Pacific').format('h:mmA')
+        ht_match_time = match_time_arrow.to('US/Hawaii').format('h:mmA')
+        gmt_match_time = match_time_arrow.to('Europe/London').format('h:mmA')
+        cet_match_time = match_time_arrow.to('Europe/Berlin').format('h:mmA')
+        nzt_match_time = match_time_arrow.to('Pacific/Auckland').format('h:mmA')
 
+        all_match_times = f'>>> :statue_of_liberty: {et_match_time} ET :black_small_square: '
+        all_match_times += f' :corn: {ct_match_time} CT :black_small_square: '
+        all_match_times += f' :mountain_snow:  {mt_match_time} MT :black_small_square: '
+        all_match_times += f' :ocean::  {pt_match_time} PT :black_small_square: '
+        all_match_times += f' :coconut:  {ht_match_time} HT :black_small_square: '
+        all_match_times += f' :kiwi: {nzt_match_time} NZT  :black_small_square: '
+        all_match_times += f' :chocolate_bar: {cet_match_time} CET'
 
-    et_match_time = match_time_arrow.to('US/Eastern').format('h:mmA')
-    ct_match_time = match_time_arrow.to('US/Central').format('h:mmA')
-    mt_match_time = match_time_arrow.to('US/Mountain').format('h:mmA')
-    pt_match_time = match_time_arrow.to('US/Pacific').format('h:mmA')
-    ht_match_time = match_time_arrow.to('US/Hawaii').format('h:mmA')
-    gmt_match_time = match_time_arrow.to('Europe/London').format('h:mmA')
-    cet_match_time = match_time_arrow.to('Europe/Berlin').format('h:mmA')
-    nzt_match_time = match_time_arrow.to('Pacific/Auckland').format('h:mmA')
+        embed.add_field(name='In Your Timezone', value=all_match_times, inline=False)
+    
+    # Show Match Results
+    if match['result']:
+        winner = f":muscle: _{match['result']['winner']['name']}_ won in {match['result']['set_count']['total']} sets"
+        embed.add_field(name='Result', value=winner)
 
-    all_match_times = f'>>> :statue_of_liberty: {et_match_time} ET :black_small_square: '
-    all_match_times += f' :corn: {ct_match_time} CT :black_small_square: '
-    all_match_times += f' :mountain_snow:  {mt_match_time} MT :black_small_square: '
-    all_match_times += f' :ocean::  {pt_match_time} PT :black_small_square: '
-    all_match_times += f' :coconut:  {ht_match_time} HT :black_small_square: '
-    all_match_times += f' :kiwi: {nzt_match_time} NZT  :black_small_square: '
-    all_match_times += f' :chocolate_bar: {cet_match_time} CET'
-
-    embed.add_field(name='In Your Timezone', value=all_match_times, inline=False)
     return embed
     

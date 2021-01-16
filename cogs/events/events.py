@@ -121,6 +121,40 @@ class Events(commands.Cog):
                     pages = get_match_menu_pages(embeds)
                     await pages.start(context)
 
+    @matches.command()
+    async def team(self, context, *args):
+        """
+        Show all upcoming matches for a team.
+        """
+        query = '+'.join(args)
+        buzz = Buzz()
+        url = buzz.matches(f'team={query}&league={buzz.LEAGUE}&season={buzz.SEASON}')
+
+        # Better safe than sorry
+        if args:
+
+            async with aiohttp.ClientSession() as cs:
+                async with cs.get(url) as r:
+                    resp = await r.json()
+                    upcoming_matches = resp['results']
+                
+                    if upcoming_matches:
+                        embeds = []
+                        for match in upcoming_matches:
+                            embeds.append(get_match_embed(match))
+
+                        pages = get_match_menu_pages(embeds)
+                        await pages.start(context)
+                    
+                    else:
+                        msg = f'Awkward. Could not find any matches for team name _{" ".join(args)}_. Try changing your search?'
+                        await context.send(msg)
+
+        else:
+            msg = f'Pray enter a team name to show matches for.'
+            await context.send(msg)
+
+
     @tasks.loop(seconds=60.0)
     async def announce(self):
         try:
