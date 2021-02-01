@@ -65,13 +65,13 @@ class Streaming(commands.Cog):
         """
         Show a list of all live Twitch streams for game.
         """
-        MINS_BEFORE=0
+        MINS_BEFORE=1
         buzz = Buzz()
         url = buzz.streams(
             f'started_n_minutes_ago={MINS_BEFORE}&is_live=true&blessed=true')
 
         logging.info(
-            f'[STREAMS] Querying Buzz API for streams that started 0 {MINS_BEFORE} minutes ago')
+            f'[STREAMS] Querying Buzz API for streams that started {MINS_BEFORE} minutes ago')
 
         async with aiohttp.ClientSession() as cs:
             async with cs.get(url) as r:
