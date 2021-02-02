@@ -84,17 +84,10 @@ class Streaming(commands.Cog):
 
                 for stream in streams:
 
-                    embed = get_stream_embed({
-                        'username': stream.user_name,
-                        'name': stream.title,
-                        'max_viewer_count': stream.viewer_count,
-                        'start_time': stream.started_at,
-                        'thumbnail': stream.thumbnail_url,
-                    },
-                        view_count=False
-                    )
+                    embed = get_stream_embed(stream, view_count=False
+)
 
-                    msg = f'**{stream.user_name}** just went live!'
+                    msg = f'**{stream["username"]}** just went live!'
                     await channel.send(msg, embed=embed)
         
     @announce.before_loop
