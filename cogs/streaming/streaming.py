@@ -68,7 +68,7 @@ class Streaming(commands.Cog):
         MINS_BEFORE=1
         buzz = Buzz()
         url = buzz.streams(
-            f'started_n_minutes_ago={MINS_BEFORE}&is_live=true&blessed=true')
+            f'started_n_minutes_ago={MINS_BEFORE}&blessed=true')
 
         logging.info(
             f'[STREAMS] Querying Buzz API for streams that started {MINS_BEFORE} minutes ago')
