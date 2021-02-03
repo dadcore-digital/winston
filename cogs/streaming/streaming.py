@@ -65,30 +65,33 @@ class Streaming(commands.Cog):
         """
         Show a list of all live Twitch streams for game.
         """
-        MINS_BEFORE=1
         buzz = Buzz()
         url = buzz.streams(
-            f'started_n_minutes_ago={MINS_BEFORE}&blessed=true')
+            f'is_live=true&blessed=true')
 
-        logging.info(
-            f'[STREAMS] Querying Buzz API for streams that started {MINS_BEFORE} minutes ago')
+        logging.info(f'[STREAMS] Querying Buzz API for latest streams.')
+
+        await db.open()
+        prev_streams = await Stream.all().values_list('stream_id', flat=True)
 
         async with aiohttp.ClientSession() as cs:
             async with cs.get(url) as r:
                 resp = await r.json()
-                streams = resp['results']
+                streams = resp['results']                
 
                 channel = self.bot.get_channel(self.CHANNEL_ID) 
 
-                logging.info(f'[STREAMS] {len(streams)} new live streams found!')
-
                 for stream in streams:
+                    stream_id = int(stream['stream_id'])
 
-                    embed = get_stream_embed(stream, view_count=False
-)
+                    if not stream_id in prev_streams:
+                        # Add to list of streams so as not to dupe
+                        await Stream.create(stream_id=stream['stream_id'])
+                        logging.info(f'[STREAMS] Found a new stream!')
 
-                    msg = f'**{stream["username"]}** just went live!'
-                    await channel.send(msg, embed=embed)
+                        embed = get_stream_embed(stream, view_count=False)
+                        msg = f'**{stream["username"]}** just went live!'
+                        await channel.send(msg, embed=embed)
         
     @announce.before_loop
     async def before_announce(self):
