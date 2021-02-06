@@ -9,8 +9,8 @@ from services.buzz import Buzz
 from services.menus import PermissiveMenuPages
 from services.settings import get_settings
 from .services import (
-    get_upcoming_matches, get_match_embed, get_next_match)
-from .menus import get_match_menu_pages
+    get_event_embed, get_upcoming_matches, get_match_embed, get_next_match)
+from .menus import get_event_menu_pages, get_match_menu_pages
 import logging
 
 settings = get_settings(['COGS', 'EVENTS'])
@@ -188,6 +188,34 @@ class Events(commands.Cog):
         
         except Exception as error:
             logging.info(f'!!! ERROR !!!: {error}')
+
+    @commands.group(invoke_without_command=True)
+    async def events(self, context, *args):
+        """
+        Show all events in next 14 days, paginated.
+        """
+        buzz = Buzz()
+        url = buzz.events('days=14')
+        
+        async with aiohttp.ClientSession() as cs:
+            async with cs.get(url) as r:
+                resp = await r.json()
+                events = resp['results']
+                msg = '__Here are the events for the next 14 days:__'
+
+                embeds = []
+                for event in events:
+                    embeds.append(get_event_embed(event))
+
+                # Catch case where there are no matches:
+                if len(embeds) == 0:
+                    msg = ':sob: No events in the next 14 days :sob:'
+                
+                await context.send(msg)
+
+                if embeds:
+                    pages = get_event_menu_pages(embeds)
+                    await pages.start(context)
 
     @announce.before_loop
     async def before_announce(self):

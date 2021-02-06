@@ -1,7 +1,9 @@
 from datetime import datetime
 import arrow
+from datetime import datetime, timedelta
 import re
 import requests
+from services.formatting import strfdelta
 from services.settings import get_settings
 from ics import Calendar
 from discord import Embed
@@ -52,9 +54,82 @@ def get_next_match(upcoming_matches):
 
     return next_match
 
+def get_event_embed(event):
+    """
+    Return Discord embed for an Event.
+
+    Keyword arguments:
+    match -- A match entry returned from the Buzz API.
+    """
+    link = None
+    if event['links']:
+        link = event['links'][0]['url']
+    
+    embed = Embed(title=event['name'], color=0x874efe, url=link)
+
+    # Event Start
+    start_time_arrow = arrow.get(event['start_time'])
+    start_time = start_time_arrow.to('US/Eastern').format('ddd MMM Do @ h:mmA')
+    embed.add_field(name='Time', value=f":calendar_spiral:   {start_time} ET")
+
+    # Event Duration
+    if event['duration']:
+        date_obj = datetime.strptime(event['duration'], '%H:%M:%S')
+        delta = timedelta(
+            hours=date_obj.hour, minutes=date_obj.minute,
+        )
+        embed.add_field(name='Duration', value=strfdelta(delta)) 
+
+    # Event Description
+    if event['description']:
+        description = f"{event['description']} "
+        embed.add_field(name='Details', value=description, inline=False)
+
+    # Event Links
+    for link in event['links']:
+        embed.add_field(name=link['name'], value=link['url'], inline=False)
+
+    # Organizers
+    if event['organizers']:
+        organizer_text = ''
+        
+        for organizer in event['organizers']:
+            organizer_text += f"{organizer['name']}"
+            if organizer['discord_username']:
+                organizer_text += f"discord: @{organizer['discord_username']}\n"
+            if organizer['twitch_username']:
+                organizer_text += f"twitch: https://twitch.tv/{organizer['twitch_username']}\n"
+            organizer_text += '\n\n'
+
+        organizer_text = organizer_text.rstrip('\n\n')
+        embed.add_field(name='Organized By', value=organizer_text, inline=False)
+
+    # In Your Timezone
+    # Only show if you match has a start time, and no result
+    et_match_time = start_time_arrow.to('US/Eastern').format('h:mmA')
+    ct_match_time = start_time_arrow.to('US/Central').format('h:mmA')
+    mt_match_time = start_time_arrow.to('US/Mountain').format('h:mmA')
+    pt_match_time = start_time_arrow.to('US/Pacific').format('h:mmA')
+    ht_match_time = start_time_arrow.to('US/Hawaii').format('h:mmA')
+    gmt_match_time = start_time_arrow.to('Europe/London').format('h:mmA')
+    cet_match_time = start_time_arrow.to('Europe/Berlin').format('h:mmA')
+    nzt_match_time = start_time_arrow.to('Pacific/Auckland').format('h:mmA')
+
+    all_match_times = f'>>> :statue_of_liberty: {et_match_time} ET :black_small_square: '
+    all_match_times += f' :corn: {ct_match_time} CT :black_small_square: '
+    all_match_times += f' :mountain_snow:  {mt_match_time} MT :black_small_square: '
+    all_match_times += f' :ocean::  {pt_match_time} PT :black_small_square: '
+    all_match_times += f' :coconut:  {ht_match_time} HT :black_small_square: '
+    all_match_times += f' :kiwi: {nzt_match_time} NZT  :black_small_square: '
+    all_match_times += f' :chocolate_bar: {cet_match_time} CET'
+
+    embed.add_field(name='In Your Timezone', value=all_match_times, inline=False)
+
+    return embed       
+
 def get_match_embed(match):
     """
-    Return dictionary of match times and discord embeds given timelie entry.
+    Return discord embed for a Match.
 
     Keyword arguments:
     match -- A match entry returned from the Buzz API.

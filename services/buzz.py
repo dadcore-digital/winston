@@ -8,7 +8,10 @@ class Buzz:
             ['BUZZ_API', 'DEFAULT_LEAGUE']).replace(' ', '+')
         self.SEASON = get_settings(
             ['BUZZ_API', 'DEFAULT_SEASON']).replace(' ', '+')
-    
+
+    def events(self, params):
+        return f'{self.API_BASE}/events/?{params}&format=json'
+
     def matches(self, params):
         return f'{self.API_BASE}/matches/?{params}&format=json'
 

@@ -19,3 +19,25 @@ def format_list_as_commas(word_list):
         return word_list[0]
     
     return None
+
+def strfdelta(tdelta):
+    """
+    Format a time delta object to be human readable.
+
+    Arguments:
+    tdelta -- Time Delta object to format. (obj)
+    """
+    delta = {'days': tdelta.days}
+    delta['hours'], rem = divmod(tdelta.seconds, 3600)
+    delta['minutes'], delta['seconds'] = divmod(rem, 60)
+    
+    result = ''
+    if delta['days'] != 0:
+        result += f"{delta['days']} days and "
+    if delta['hours'] != 0:
+        result += f"{delta['hours']} hours and "
+    if delta['minutes'] != 0:
+        result += f"{delta['minutes']} minutes"
+
+    result = result.rstrip(' and ')
+    return result
