@@ -1,3 +1,5 @@
+import math
+
 def format_list_as_commas(word_list):
     """
     Given a list like ['one', 'two', 'three'] return 'one, two, and three'
@@ -41,3 +43,18 @@ def strfdelta(tdelta):
 
     result = result.rstrip(' and ')
     return result
+
+def split_message(msg, LINES_PER_MESSAGE=25):
+    """Return a list of messages based on number of lines."""
+    msgs = []
+
+    lines = msg.split('\n')
+    num_messages = math.ceil(len(lines) / LINES_PER_MESSAGE)
+    
+    for idx in range(num_messages):
+        start_point = idx * LINES_PER_MESSAGE
+        msg_chunk = '\n'.join(
+            lines[start_point:start_point + (LINES_PER_MESSAGE - 1)])
+        msgs.append(msg_chunk)
+    
+    return msgs

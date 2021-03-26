@@ -1,3 +1,4 @@
+import math
 import uuid
 import io
 import requests
@@ -9,6 +10,7 @@ from discord.ext import commands
 from tabulate import tabulate
 from tortoise.exceptions import DoesNotExist
 from services import db
+from services.formatting import split_message
 from services.settings import get_settings
 from .models import Response
 
@@ -82,7 +84,11 @@ class AutoResponder(commands.Cog):
                     table_data = tabulate(table, headers=headers, tablefmt='presto')
                     msg = f'__Here is a list of all auto-responders with that shorcut__:\n```\n{table_data}\n```'                
                     msg += f'Enter `show delete {shortcut} <index>` to delete a response.'
-                    await context.send(msg)
+                    
+                    messages = split_message(msg)
+                    for entry in messages:
+                        await context.send(entry)
+
                 if len(args) == 2:
                     try:
                         index = int(args[1])
@@ -130,7 +136,12 @@ class AutoResponder(commands.Cog):
 
         table_data = tabulate(table, headers=headers, tablefmt=tablefmt)
         msg = f'__Here is a list of all auto-responders__:\n```\n{table_data}\n```'
-        await context.send(msg)
+        
+        messages = split_message(msg)
+
+        for entry in messages:
+            await context.send(entry)
+
         await db.close()
 
 
