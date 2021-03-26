@@ -82,11 +82,18 @@ class AutoResponder(commands.Cog):
                         table.append([idx, response.shortcut, text]) 
 
                     table_data = tabulate(table, headers=headers, tablefmt='presto')
-                    msg = f'__Here is a list of all auto-responders with that shorcut__:\n```\n{table_data}\n```'                
-                    msg += f'Enter `show delete {shortcut} <index>` to delete a response.'
+                    title_msg = f'__Here is a list of all auto-responders with that shorcut__:\n'                
+                    footer_msg = f'Enter `show delete {shortcut} <index>` to delete a response.'
                     
-                    messages = split_message(msg)
-                    for entry in messages:
+                    messages = split_message(table_data)
+                    for idx, entry in enumerate(messages):
+                        entry = f'```\n{entry}\n```'
+                        
+                        if idx == 0:
+                            entry = f'{title_msg} {entry}'
+                        elif idx == len(messages) - 1:
+                            entry = f'{entry} {footer_msg}'
+                        
                         await context.send(entry)
 
                 if len(args) == 2:
@@ -135,11 +142,15 @@ class AutoResponder(commands.Cog):
             table.append([response.shortcut, text]) 
 
         table_data = tabulate(table, headers=headers, tablefmt=tablefmt)
-        msg = f'__Here is a list of all auto-responders__:\n```\n{table_data}\n```'
+        title_msg = f'__Here is a list of all auto-responders__:\n'                
         
-        messages = split_message(msg)
-
-        for entry in messages:
+        messages = split_message(table_data)
+        for idx, entry in enumerate(messages):
+            entry = f'```\n{entry}\n```'
+            
+            if idx == 0:
+                entry = f'{title_msg} {entry}'
+            
             await context.send(entry)
 
         await db.close()
