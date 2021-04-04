@@ -104,10 +104,25 @@ def get_player_summary_embed(player):
                 inline=False
             )
     
-    if player['award_summary']:
+    if player['awards']:
+        award_summary_dict = {}
         award_summary = ''
+
+
+        for award in player['awards']:
+            category = award['award_category']['id']
+
+            if category in award_summary_dict:
+               award_summary_dict[category]['count'] += 1
+            else:
+                award_summary_dict[category] = {
+                    'name': award['award_category']['name'],
+                    'discord_emoji': award['award_category']['discord_emoji'],
+                    'count': 1
+                }
         
-        for award in player['award_summary']:
+        for category_id in award_summary_dict:
+            award = award_summary_dict[category_id]
             award_summary += f"{award['discord_emoji']} {award['name']} x{award['count']} \n"
         award_summary = award_summary.rstrip('\n')
 
