@@ -212,9 +212,10 @@ def get_match_embed(match):
     # Away Team
     away_team_title = f":small_blue_diamond: {match['away']['name']}"
     away_team_summary = f"_{match['away']['wins']} Wins, {match['away']['losses']} Losses_"
-
+    
+    away_team_members = [member['name'] for member in match['away']['members']]
     away_team_members = "{} and {}".format(", ".join(
-        match['away']['members'][:-1]), match['away']['members'][-1]
+        away_team_members[:-1]), away_team_members[-1]
     ).replace('_', '').replace('*', '')
     away_team_summary += f'\n{away_team_members}'
     embed.add_field(name=away_team_title, value=away_team_summary, inline=False)
@@ -223,8 +224,9 @@ def get_match_embed(match):
     home_team_title = f":small_orange_diamond: {match['home']['name']}"
     home_team_summary = f"*{match['home']['wins']} Wins, {match['home']['losses']} Losses*"
 
+    home_team_members = [member['name'] for member in match['home']['members']]
     home_team_members = "{} and {}".format(", ".join(
-        match['home']['members'][:-1]), match['home']['members'][-1]
+       home_team_members[:-1]), home_team_members[-1]
     ).replace('_', '').replace('*', '')
     home_team_summary += f'\n{home_team_members}'
 
@@ -255,7 +257,7 @@ def get_match_embed(match):
     
     # Show Match Results
     if match['result']:
-        winner = f":muscle: _{match['result']['winner']['name']}_ won in {match['result']['set_count']['total']} sets"
+        winner = f":muscle: _{match['result']['winner']}_ won in {match['result']['sets_total']} sets"
         embed.add_field(name='Result', value=winner)
 
     return embed
