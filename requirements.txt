@@ -29,7 +29,7 @@ ipython-genutils==0.2.0
 iso8601==0.1.12
 jedi==0.16.0
 joblib==0.16.0
-lxml==4.5.0
+lxml==4.6.5
 multidict==4.7.5
 nltk==3.5
 numpy==1.19.1
